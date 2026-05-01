@@ -1,0 +1,147 @@
+import { useParams, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Package, Layers, Users, Truck } from 'lucide-react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import ProductCard from '@/components/ProductCard';
+import { products, categories } from '@/data/products';
+import { useCart } from '@/contexts/CartContext';
+
+const ProductDetail = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const product = products.find(p => p.slug === slug);
+  const { addItem } = useCart();
+  const [selectedVariant, setSelectedVariant] = useState(0);
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Product not found</h1>
+          <Link to="/" className="text-primary mt-4 inline-block">Go Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const variant = product.variants[selectedVariant];
+  const category = categories.find(c => c.id === product.categoryId);
+  const related = products.filter(p => p.categoryId === product.categoryId && p.id !== product.id).slice(0, 5);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-4 py-4">
+        <div className="text-sm text-muted-foreground mb-4">
+          <Link to="/" className="hover:text-primary">Home</Link>
+          {' / '}
+          <Link to={`/category/${category?.slug}`} className="hover:text-primary">{category?.name}</Link>
+          {' / '}
+          <span className="text-primary">{product.name}</span>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="rounded-xl overflow-hidden border border-border">
+            <img src={product.image} alt={product.name} className="w-full aspect-square object-cover" />
+          </div>
+
+          <div>
+            <h1 className="text-2xl font-bold">{product.name}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{product.tags.join(' | ')}</p>
+
+            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1"><Package className="h-4 w-4" /> {product.weight}</span>
+              {product.pieces && <span className="flex items-center gap-1"><Layers className="h-4 w-4" /> {product.pieces}</span>}
+              {product.serves && <span className="flex items-center gap-1"><Users className="h-4 w-4" /> Serves {product.serves}</span>}
+            </div>
+
+            {product.discount >= 20 && (
+              <div className="flex items-center justify-between mt-4 rounded-lg border border-border px-4 py-2">
+                <span className="text-sm font-medium">
+                  {product.discount}% off + Free delivery <span className="text-muted-foreground">*For First 5 Orders</span>
+                </span>
+                <span className="rounded-md bg-primary px-2 py-1 text-xs font-bold text-primary-foreground">Code: BEAUTY20</span>
+              </div>
+            )}
+
+            <p className="text-sm mt-4">{product.description}</p>
+
+            {product.ingredients && (
+              <div className="mt-4">
+                <h3 className="text-sm font-bold">Key Ingredients</h3>
+                <p className="text-sm text-muted-foreground mt-1">{product.ingredients}</p>
+              </div>
+            )}
+
+            {product.howToUse && (
+              <div className="mt-3">
+                <h3 className="text-sm font-bold">How to Use</h3>
+                <p className="text-sm text-muted-foreground mt-1">{product.howToUse}</p>
+              </div>
+            )}
+
+            {/* Variants */}
+            {product.variants.length > 1 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-bold mb-2">Select Variant</h3>
+                <div className="flex gap-2 flex-wrap">
+                  {product.variants.map((v, i) => (
+                    <button
+                      key={v.id}
+                      onClick={() => setSelectedVariant(i)}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        i === selectedVariant
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {v.name} – {v.size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-4 mt-6">
+              <div>
+                <span className="text-2xl font-bold">₹{variant.price}</span>
+                {variant.mrp > variant.price && (
+                  <span className="text-sm text-success ml-2">{product.discount}% off</span>
+                )}
+                {variant.mrp > variant.price && (
+                  <p className="text-sm text-muted-foreground">
+                    MRP: <span className="line-through">₹{variant.mrp}</span> (incl. of all taxes)
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => addItem(product, variant.id)}
+                className="ml-auto rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                Add +
+              </button>
+            </div>
+
+            <p className="text-sm text-success mt-3 flex items-center gap-1">
+              <Truck className="h-4 w-4" /> Delivery in {product.deliveryTime}
+            </p>
+          </div>
+        </div>
+
+        {/* Related */}
+        {related.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-lg font-bold">You may also like</h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+              {related.map(p => <ProductCard key={p.id} product={p} />)}
+            </div>
+          </section>
+        )}
+      </div>
+      <Footer />
+    </div>
+  );
+};
+
+export default ProductDetail;
