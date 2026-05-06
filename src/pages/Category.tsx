@@ -3,7 +3,12 @@ import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import PromoBanner from '@/components/banners/PromoBanner';
+import BannerSlider from '@/components/banners/BannerSlider';
 import { products, categories, subCategories } from '@/data/products';
+import sale50 from '@/assets/banners/sale-50-off.jpg';
+import glowUp from '@/assets/banners/glow-up-sale.jpg';
+import hairCare from '@/assets/banners/hair-care-week.jpg';
 
 const Category = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -29,6 +34,12 @@ const Category = () => {
     return p.subCategoryId === activeSub;
   });
 
+  const categoryBanners = [
+    { image: sale50, alt: '50% Off Sale' },
+    { image: glowUp, alt: 'Glow Up Sale' },
+    { image: hairCare, alt: 'Hair Care Essentials' },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -36,6 +47,9 @@ const Category = () => {
         <div className="text-sm text-muted-foreground mb-2">
           <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-primary">{category.name}</span>
         </div>
+
+        {/* Top Slider Banner */}
+        <BannerSlider banners={categoryBanners} className="mb-4" />
 
         <h1 className="text-xl font-bold">{category.name}</h1>
 
@@ -76,9 +90,22 @@ const Category = () => {
 
         <p className="text-sm text-muted-foreground mt-3">{filteredProducts.length} items available</p>
 
+        {/* First batch of products */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-          {filteredProducts.map(p => <ProductCard key={p.id} product={p} />)}
+          {filteredProducts.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
         </div>
+
+        {/* Mid-section promo strip */}
+        {filteredProducts.length > 4 && (
+          <PromoBanner title="Special Offer" subtitle={`Up to 40% off on ${category.name}`} variant="small" link={`/category/${category.slug}`} className="mt-6" />
+        )}
+
+        {/* Remaining products */}
+        {filteredProducts.length > 4 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            {filteredProducts.slice(4).map(p => <ProductCard key={p.id} product={p} />)}
+          </div>
+        )}
 
         {/* Recommended */}
         <div className="mt-10">

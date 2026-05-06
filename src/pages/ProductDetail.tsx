@@ -4,8 +4,13 @@ import { Package, Layers, Users, Truck } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import PromoBanner from '@/components/banners/PromoBanner';
+import DualBanner from '@/components/banners/DualBanner';
 import { products, categories } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
+import freeShipping from '@/assets/banners/free-shipping.jpg';
+import glowUp from '@/assets/banners/glow-up-sale.jpg';
+import newArrivals from '@/assets/banners/new-arrivals.jpg';
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -129,15 +134,28 @@ const ProductDetail = () => {
           </div>
         </div>
 
+        {/* Promo banner between product and related */}
+        <PromoBanner title="Free Shipping" subtitle="on orders above ₹499" variant="small" link="/category/skincare" className="mt-8" />
+
+        {/* Dual Banner */}
+        <DualBanner
+          left={{ image: glowUp, title: 'Skincare Sale', subtitle: 'Up to 40% off', link: '/category/skincare' }}
+          right={{ image: newArrivals, title: 'New Arrivals', subtitle: 'Trending now', link: '/category/new-arrivals' }}
+          className="mt-6"
+        />
+
         {/* Related */}
         {related.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-10">
             <h2 className="text-lg font-bold">You may also like</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
               {related.map(p => <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
         )}
+
+        {/* Bottom banner */}
+        <PromoBanner image={freeShipping} title="Free Shipping on ₹499+" variant="horizontal" link="/category/bestsellers" className="mt-8" />
       </div>
       <Footer />
     </div>
