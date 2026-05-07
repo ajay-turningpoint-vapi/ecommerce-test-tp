@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import type { Product } from '@/types';
 
@@ -8,8 +8,10 @@ interface Props {
 }
 
 const ProductCard = ({ product }: Props) => {
-  const { addItem } = useCart();
+  const { items, addItem, updateQuantity } = useCart();
   const variant = product.variants[0];
+  const cartItem = items.find(i => i.product.id === product.id && i.variantId === variant.id);
+  const qty = cartItem?.quantity || 0;
 
   return (
     <div className="group rounded-lg border border-border bg-card overflow-hidden">
@@ -20,15 +22,36 @@ const ProductCard = ({ product }: Props) => {
           loading="lazy"
           className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <button
-          onClick={e => {
-            e.preventDefault();
-            addItem(product, variant.id);
-          }}
-          className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-        >
-          <Plus className="h-3 w-3" /> Add
-        </button>
+        {qty === 0 ? (
+          <button
+            onClick={e => {
+              e.preventDefault();
+              addItem(product, variant.id);
+            }}
+            className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+          >
+            <Plus className="h-3 w-3" /> Add
+          </button>
+        ) : (
+          <div
+            onClick={e => e.preventDefault()}
+            className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background overflow-hidden"
+          >
+            <button
+              onClick={e => { e.preventDefault(); updateQuantity(product.id, variant.id, qty - 1); }}
+              className="px-2 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <span className="px-2 text-xs font-bold text-primary">{qty}</span>
+            <button
+              onClick={e => { e.preventDefault(); updateQuantity(product.id, variant.id, qty + 1); }}
+              className="px-2 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+        )}
       </Link>
       <div className="p-3">
         <Link to={`/product/${product.slug}`}>
