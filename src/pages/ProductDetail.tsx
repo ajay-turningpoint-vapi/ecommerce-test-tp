@@ -31,6 +31,8 @@ const ProductDetail = () => {
   }
 
   const variant = product.variants[selectedVariant];
+  const cartItem = items.find(i => i.product.id === product.id && i.variantId === variant.id);
+  const qty = cartItem?.quantity || 0;
   const category = categories.find(c => c.id === product.categoryId);
   const related = products.filter(p => p.categoryId === product.categoryId && p.id !== product.id).slice(0, 5);
 
