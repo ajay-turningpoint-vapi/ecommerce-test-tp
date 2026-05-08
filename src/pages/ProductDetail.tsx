@@ -15,7 +15,7 @@ import newArrivals from '@/assets/banners/new-arrivals.jpg';
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const product = products.find(p => p.slug === slug);
-  const { addItem } = useCart();
+  const { items, addItem, updateQuantity } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(0);
 
   if (!product) {
