@@ -122,12 +122,30 @@ const ProductDetail = () => {
                   </p>
                 )}
               </div>
-              <button
-                onClick={() => addItem(product, variant.id)}
-                className="ml-auto rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
-              >
-                Add +
-              </button>
+              {qty === 0 ? (
+                <button
+                  onClick={() => addItem(product, variant.id)}
+                  className="ml-auto rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                >
+                  Add to Cart
+                </button>
+              ) : (
+                <div className="ml-auto flex items-center gap-3 rounded-lg border border-primary overflow-hidden">
+                  <button
+                    onClick={() => updateQuantity(product.id, variant.id, qty - 1)}
+                    className="px-3 py-3 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="text-sm font-bold text-primary min-w-[1.5rem] text-center">{qty}</span>
+                  <button
+                    onClick={() => updateQuantity(product.id, variant.id, qty + 1)}
+                    className="px-3 py-3 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <p className="text-sm text-success mt-3 flex items-center gap-1">
