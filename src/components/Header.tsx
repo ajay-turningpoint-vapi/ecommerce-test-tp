@@ -39,8 +39,8 @@ const Header = () => {
           </div>
         </div>
 
-        <div className="flex-1 max-w-lg">
-          <div className="relative">
+        <div className="hidden md:flex flex-1 max-w-lg">
+          <div className="relative w-full">
             <input
               type="text"
               placeholder="Search for any beauty product..."
@@ -83,11 +83,29 @@ const Header = () => {
 
           <Link
             to="/cart"
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+            className="relative flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
           >
             <ShoppingCart className="h-4 w-4" />
-            {totalItems} items · ₹{totalPrice}
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                {totalItems}
+              </span>
+            )}
           </Link>
+        </div>
+      </div>
+
+      {/* Mobile search bar on second line */}
+      <div className="md:hidden px-4 pb-3">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search for any beauty product..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-4 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring"
+          />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
       </div>
     </header>
