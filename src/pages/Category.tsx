@@ -1,20 +1,30 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import PromoBanner from '@/components/banners/PromoBanner';
 import BannerSlider from '@/components/banners/BannerSlider';
+import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
+import BannerSkeleton from '@/components/skeletons/BannerSkeleton';
 import { products, categories, subCategories } from '@/data/products';
 import sale50 from '@/assets/banners/sale-50-off.jpg';
 import glowUp from '@/assets/banners/glow-up-sale.jpg';
 import hairCare from '@/assets/banners/hair-care-week.jpg';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Category = () => {
   const { slug } = useParams<{ slug: string }>();
   const category = categories.find(c => c.slug === slug);
   const subs = subCategories.filter(s => s.categoryId === category?.id);
   const [activeSub, setActiveSub] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(timer);
+  }, [slug]);
 
   if (!category) {
     return (
@@ -48,34 +58,39 @@ const Category = () => {
           <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-primary">{category.name}</span>
         </div>
 
-        {/* Top Slider Banner */}
-        <BannerSlider banners={categoryBanners} className="mb-4" />
+        {loading ? <BannerSkeleton variant="hero" className="mb-4" /> : <BannerSlider banners={categoryBanners} className="mb-4" />}
 
         <h1 className="text-xl font-bold">{category.name}</h1>
 
-        {/* Sub-category pills */}
         {subs.length > 0 && (
           <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
-            {subs.map(sub => (
-              <button
-                key={sub.id}
-                onClick={() => setActiveSub(sub.slug === 'all' ? 'all' : sub.id)}
-                className={`flex flex-col items-center gap-1 shrink-0 ${
-                  (sub.slug === 'all' && activeSub === 'all') || activeSub === sub.id
-                    ? 'opacity-100'
-                    : 'opacity-60 hover:opacity-80'
-                }`}
-              >
-                <div className={`w-14 h-14 rounded-full overflow-hidden border-2 ${
-                  (sub.slug === 'all' && activeSub === 'all') || activeSub === sub.id
-                    ? 'border-primary'
-                    : 'border-border'
-                }`}>
-                  <img src={sub.image} alt={sub.name} className="w-full h-full object-cover" />
-                </div>
-                <span className="text-xs font-medium">{sub.name}</span>
-              </button>
-            ))}
+            {loading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1 shrink-0">
+                    <Skeleton className="w-14 h-14 rounded-full" />
+                    <Skeleton className="h-3 w-10" />
+                  </div>
+                ))
+              : subs.map(sub => (
+                  <button
+                    key={sub.id}
+                    onClick={() => setActiveSub(sub.slug === 'all' ? 'all' : sub.id)}
+                    className={`flex flex-col items-center gap-1 shrink-0 ${
+                      (sub.slug === 'all' && activeSub === 'all') || activeSub === sub.id
+                        ? 'opacity-100'
+                        : 'opacity-60 hover:opacity-80'
+                    }`}
+                  >
+                    <div className={`w-14 h-14 rounded-full overflow-hidden border-2 ${
+                      (sub.slug === 'all' && activeSub === 'all') || activeSub === sub.id
+                        ? 'border-primary'
+                        : 'border-border'
+                    }`}>
+                      <img src={sub.image} alt={sub.name} className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-xs font-medium">{sub.name}</span>
+                  </button>
+                ))}
           </div>
         )}
 
@@ -90,31 +105,33 @@ const Category = () => {
 
         <p className="text-sm text-muted-foreground mt-3">{filteredProducts.length} items available</p>
 
-        {/* First batch of products */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-          {filteredProducts.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+            : filteredProducts.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
         </div>
 
-        {/* Mid-section promo strip */}
         {filteredProducts.length > 4 && (
           <PromoBanner title="Special Offer" subtitle={`Up to 40% off on ${category.name}`} variant="small" link={`/category/${category.slug}`} className="mt-6" />
         )}
 
-        {/* Remaining products */}
         {filteredProducts.length > 4 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {filteredProducts.slice(4).map(p => <ProductCard key={p.id} product={p} />)}
+            {loading
+              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              : filteredProducts.slice(4).map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         )}
 
-        {/* Recommended */}
         <div className="mt-10">
           <h2 className="text-lg font-bold italic">Recommended for you</h2>
           <p className="text-sm text-muted-foreground">You might also like these</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {products.filter(p => p.categoryId !== category.id).slice(0, 4).map(p => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+            {loading
+              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
+              : products.filter(p => p.categoryId !== category.id).slice(0, 4).map(p => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
           </div>
         </div>
       </div>
