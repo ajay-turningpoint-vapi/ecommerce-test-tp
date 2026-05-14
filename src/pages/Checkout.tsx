@@ -80,18 +80,18 @@ const Checkout = () => {
       <Header />
 
       {/* Stepper */}
-      <div className="flex items-center justify-center gap-0 py-6">
+      <div className="flex items-center justify-center gap-0 px-4 py-4 md:py-6">
         {steps.map((s, i) => (
           <div key={s} className="flex items-center">
-            <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center text-[10px] md:text-xs font-bold ${
                 i < step ? 'bg-success text-success-foreground' : i === step ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
               }`}>
-                {i < step ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                {i < step ? <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4" /> : i + 1}
               </div>
-              <span className={`text-sm font-medium ${i <= step ? 'text-foreground' : 'text-muted-foreground'}`}>{s}</span>
+              <span className={`text-xs md:text-sm font-medium ${i <= step ? 'text-foreground' : 'text-muted-foreground'}`}>{s}</span>
             </div>
-            {i < steps.length - 1 && <div className={`w-20 h-0.5 mx-3 ${i < step ? 'bg-success' : 'bg-muted'}`} />}
+            {i < steps.length - 1 && <div className={`w-8 md:w-20 h-0.5 mx-1.5 md:mx-3 ${i < step ? 'bg-success' : 'bg-muted'}`} />}
           </div>
         ))}
       </div>
