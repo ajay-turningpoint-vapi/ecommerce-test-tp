@@ -20,6 +20,7 @@ const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const Login = lazy(() => import("./pages/Login"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Search = lazy(() => import("./pages/Search"));
+const Categories = lazy(() => import("./pages/Categories"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Admin pages
