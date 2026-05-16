@@ -260,47 +260,81 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              <div className="flex items-center gap-4 mt-6">
-                <div>
-                  <span className="text-2xl font-bold">₹{variant.price}</span>
-                  {variant.mrp > variant.price && (
-                    <span className="text-sm text-success ml-2">{product.discount}% off</span>
-                  )}
-                  {variant.mrp > variant.price && (
-                    <p className="text-sm text-muted-foreground">
-                      MRP: <span className="line-through">₹{variant.mrp}</span> (incl. of all taxes)
-                    </p>
-                  )}
-                </div>
-                {qty === 0 ? (
-                  <button
-                    onClick={() => addItem(product, variant.id)}
-                    className="ml-auto rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
-                  >
-                    Add to Cart
-                  </button>
-                ) : (
-                  <div className="ml-auto flex items-center gap-3 rounded-lg border border-primary overflow-hidden">
-                    <button
-                      onClick={() => updateQuantity(product.id, variant.id, qty - 1)}
-                      className="px-3 py-3 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="text-sm font-bold text-primary min-w-[1.5rem] text-center">{qty}</span>
-                    <button
-                      onClick={() => updateQuantity(product.id, variant.id, qty + 1)}
-                      className="px-3 py-3 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-              </div>
+              {(() => {
+                const stock = getStockInfo(product.id, variant.id);
+                const isOut = stock.status === 'out';
+                return (
+                  <>
+                    <div className="flex items-center gap-4 mt-6">
+                      <div>
+                        <span className="text-2xl font-bold">₹{variant.price}</span>
+                        {variant.mrp > variant.price && (
+                          <span className="text-sm text-success ml-2">{product.discount}% off</span>
+                        )}
+                        {variant.mrp > variant.price && (
+                          <p className="text-sm text-muted-foreground">
+                            MRP: <span className="line-through">₹{variant.mrp}</span> (incl. of all taxes)
+                          </p>
+                        )}
+                      </div>
+                      {isOut ? (
+                        <button
+                          disabled
+                          className="ml-auto rounded-lg bg-muted px-6 py-3 text-sm font-bold text-muted-foreground cursor-not-allowed"
+                        >
+                          Out of Stock
+                        </button>
+                      ) : qty === 0 ? (
+                        <button
+                          onClick={() => addItem(product, variant.id)}
+                          className="ml-auto rounded-lg bg-primary px-6 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                        >
+                          Add to Cart
+                        </button>
+                      ) : (
+                        <div className="ml-auto flex items-center gap-3 rounded-lg border border-primary overflow-hidden">
+                          <button
+                            onClick={() => updateQuantity(product.id, variant.id, qty - 1)}
+                            className="px-3 py-3 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="text-sm font-bold text-primary min-w-[1.5rem] text-center">{qty}</span>
+                          <button
+                            onClick={() => updateQuantity(product.id, variant.id, qty + 1)}
+                            className="px-3 py-3 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
-              <p className="text-sm text-success mt-3 flex items-center gap-1">
-                <Truck className="h-4 w-4" /> Delivery in {product.deliveryTime}
-              </p>
+                    {/* Stock status */}
+                    <div className="mt-3">
+                      {isOut ? (
+                        <p className="text-sm text-destructive flex items-center gap-1.5 font-medium">
+                          <AlertCircle className="h-4 w-4" /> Currently out of stock
+                        </p>
+                      ) : stock.status === 'low' ? (
+                        <p className="text-sm text-destructive flex items-center gap-1.5 font-medium">
+                          <AlertCircle className="h-4 w-4" /> Hurry! {stock.label}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-success flex items-center gap-1.5">
+                          <CheckCircle2 className="h-4 w-4" /> In stock
+                        </p>
+                      )}
+                    </div>
+
+                    {!isOut && (
+                      <p className="text-sm text-success mt-2 flex items-center gap-1">
+                        <Truck className="h-4 w-4" /> Delivery in {product.deliveryTime}
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
         )}
