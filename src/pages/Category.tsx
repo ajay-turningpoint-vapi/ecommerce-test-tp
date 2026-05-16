@@ -290,12 +290,12 @@ const Category = () => {
                   </div>
                 ))}
               </div>
-              {activeFilterCount > 0 && (
+              {(activeFilterCount > 0 || sortOrder !== 'none') && (
                 <button
                   onClick={() => setFilterOpen(false)}
                   className="w-full rounded-lg bg-primary py-2.5 text-sm font-bold text-primary-foreground mt-2"
                 >
-                  Show {filteredProducts.length} results
+                  Show {sortedProducts.length} results
                 </button>
               )}
             </SheetContent>
