@@ -5,38 +5,24 @@ import ProductCard from '@/components/ProductCard';
 import BannerSlider from '@/components/banners/BannerSlider';
 import PromoBanner from '@/components/banners/PromoBanner';
 import DualBanner from '@/components/banners/DualBanner';
-import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
-import BannerSkeleton from '@/components/skeletons/BannerSkeleton';
-import CategorySkeleton from '@/components/skeletons/CategorySkeleton';
 import { useDbProducts } from '@/hooks/useDbProducts';
 import { useDbCategories } from '@/hooks/useDbCategories';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useSyncExternalStore } from 'react';
+import { getBanners, subscribe, getVersion } from '@/data/adminSharedData';
 
 const Index = () => {
-  const { data: products = [], isLoading: productsLoading } = useDbProducts();
-  const { data: catData, isLoading: catsLoading } = useDbCategories();
+  useSyncExternalStore(subscribe, getVersion, getVersion);
+  const { data: products = [] } = useDbProducts();
+  const { data: catData } = useDbCategories();
   const categories = catData?.categories || [];
 
-  const { data: banners = [], isLoading: bannersLoading } = useQuery({
-    queryKey: ['banners-home'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .eq('status', 'active')
-        .order('position');
-      if (error) throw error;
-      return (data || []).map(b => ({
-        image: b.image_url,
-        alt: b.title,
-        link: b.link || undefined,
-      }));
-    },
-    staleTime: 10 * 60 * 1000,
-  });
+  const allBanners = getBanners();
+  const banners = allBanners
+    .filter(b => b.status === 'Active')
+    .sort((a, b) => a.position - b.position)
+    .map(b => ({ image: b.imageUrl, alt: b.title, link: b.link || undefined }));
 
-  const loading = productsLoading || catsLoading || bannersLoading;
+  const loading = false;
 
   const currentHits = products.slice(0, 5);
   const recommended = products.slice(5, 11);
