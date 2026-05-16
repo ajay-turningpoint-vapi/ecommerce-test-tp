@@ -19,6 +19,7 @@ export interface Product {
   subCategoryId: string;
   brandName?: string;
   image: string;
+  images?: string[];
   description: string;
   tags: string[];
   weight: string;
