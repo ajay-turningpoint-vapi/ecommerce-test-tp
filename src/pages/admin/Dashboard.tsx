@@ -7,6 +7,7 @@ import { useAdminStore } from '@/hooks/useAdminStore';
 const LOW_STOCK_THRESHOLD = 10;
 
 const Dashboard = () => {
+  useAdminStore();
   const orders = useMemo(() => getOrders(), []);
   const stock = useMemo(() => getStock(), []);
   const customers = useMemo(() => getCustomers(), []);
