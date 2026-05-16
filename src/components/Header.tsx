@@ -57,10 +57,10 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative hidden md:block" ref={dropdownRef}>
             <button
               onClick={() => setShowCategories(!showCategories)}
-              className="hidden md:flex items-center gap-1 text-sm font-medium"
+              className="flex items-center gap-1 text-sm font-medium"
             >
               Categories <ChevronDown className="h-3 w-3" />
             </button>
@@ -80,14 +80,14 @@ const Header = () => {
             )}
           </div>
 
-          <Link to={user ? '/profile' : '/login'} className="flex items-center gap-1 text-sm font-medium">
+          <Link to={user ? '/profile' : '/login'} className="hidden md:flex items-center gap-1 text-sm font-medium">
             <User className="h-4 w-4" />
-            <span className="hidden md:inline">{user ? 'Profile' : 'Login'}</span>
+            <span>{user ? 'Profile' : 'Login'}</span>
           </Link>
 
           <Link
             to="/cart"
-            className="relative flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
+            className="relative hidden md:flex items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground"
           >
             <ShoppingCart className="h-4 w-4" />
             {totalItems > 0 && (
