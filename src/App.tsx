@@ -27,6 +27,8 @@ const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const OrderManagement = lazy(() => import("./pages/admin/OrderManagement"));
 const ProductManagement = lazy(() => import("./pages/admin/ProductManagement"));
 const CategoryManagement = lazy(() => import("./pages/admin/CategoryManagement"));
+const BrandManagement = lazy(() => import("./pages/admin/BrandManagement"));
+const AttributeManagement = lazy(() => import("./pages/admin/AttributeManagement"));
 const StockManagement = lazy(() => import("./pages/admin/StockManagement"));
 const CustomerManagement = lazy(() => import("./pages/admin/CustomerManagement"));
 const ShippingManagement = lazy(() => import("./pages/admin/ShippingManagement"));
