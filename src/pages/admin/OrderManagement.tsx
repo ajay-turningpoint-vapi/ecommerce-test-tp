@@ -1,29 +1,30 @@
 import { useState, useMemo } from 'react';
 import { Eye, X, Search } from 'lucide-react';
-import { useAdminOrders, useAdminMutation } from '@/hooks/useAdminData';
+import { store } from '@/data/adminStore';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton';
 
 const statusColors: Record<string, string> = {
-  ORDER_PLACED: 'bg-yellow-100 text-yellow-800', CONFIRMED: 'bg-blue-100 text-blue-800',
-  PACKED: 'bg-purple-100 text-purple-800', SHIPPED: 'bg-indigo-100 text-indigo-800',
-  DELIVERED: 'bg-green-100 text-green-800', CANCELLED: 'bg-red-100 text-red-800',
-  RETURN_REQUESTED: 'bg-orange-100 text-orange-800',
+  ORDER_PLACED: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  CONFIRMED: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  PACKED: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  SHIPPED: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+  DELIVERED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  CANCELLED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  RETURN_REQUESTED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
 };
 
 const allStatuses = ['ORDER_PLACED', 'CONFIRMED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURN_REQUESTED'];
 
 const OrderManagement = () => {
-  const { data: orders = [], isLoading } = useAdminOrders();
-  const { update } = useAdminMutation('orders');
+  const [orders, setOrders] = useState([...store.orders]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const filtered = useMemo(() =>
-    orders.filter((o: any) => {
-      const matchSearch = o.order_number.toLowerCase().includes(search.toLowerCase()) ||
-        (o.user_addresses?.name || '').toLowerCase().includes(search.toLowerCase());
+    orders.filter(o => {
+      const matchSearch = o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
+        o.customerName.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === 'All' || o.status === statusFilter;
       return matchSearch && matchStatus;
     }),
@@ -31,15 +32,12 @@ const OrderManagement = () => {
   );
 
   const updateStatus = (id: string, status: string) => {
-    update.mutate({ id, status }, {
-      onSuccess: () => { toast.success(`Order status updated to ${status}`); setSelectedOrder(null); },
-      onError: (e) => toast.error(e.message),
-    });
+    const order = store.orders.find(o => o.id === id);
+    if (order) { order.status = status; setOrders([...store.orders]); toast.success(`Status updated to ${status.replace(/_/g, ' ')}`); }
+    setSelectedId(null);
   };
 
-  const detail = selectedOrder ? orders.find((o: any) => o.id === selectedOrder) : null;
-
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-64 w-full" /></div>;
+  const detail = selectedId ? orders.find(o => o.id === selectedId) : null;
 
   return (
     <div className="space-y-4">
@@ -47,8 +45,8 @@ const OrderManagement = () => {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by order # or name..."
-            className="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by order # or customer..."
+            className="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
         </div>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
@@ -69,18 +67,18 @@ const OrderManagement = () => {
             <th className="text-left px-4 py-3 font-medium">Actions</th>
           </tr></thead>
           <tbody>
-            {filtered.map((o: any) => (
-              <tr key={o.id} className="border-b border-border hover:bg-muted/30">
-                <td className="px-4 py-3 font-medium">{o.order_number}</td>
-                <td className="px-4 py-3">{o.users?.name || o.user_addresses?.name || '—'}</td>
-                <td className="px-4 py-3">{new Date(o.created_at).toLocaleDateString('en-IN')}</td>
-                <td className="px-4 py-3 font-medium">₹{o.total_amount}</td>
-                <td className="px-4 py-3">{o.payment_status}</td>
+            {filtered.map(o => (
+              <tr key={o.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                <td className="px-4 py-3 font-medium">{o.orderNumber}</td>
+                <td className="px-4 py-3">{o.customerName}</td>
+                <td className="px-4 py-3">{new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
+                <td className="px-4 py-3 font-medium">₹{o.totalAmount}</td>
+                <td className="px-4 py-3">{o.paymentStatus}</td>
                 <td className="px-4 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[o.status] || 'bg-muted'}`}>{o.status.replace(/_/g, ' ')}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <button onClick={() => setSelectedOrder(o.id)} className="p-1.5 rounded hover:bg-muted"><Eye className="h-4 w-4" /></button>
+                  <button onClick={() => setSelectedId(o.id)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
                 </td>
               </tr>
             ))}
@@ -91,46 +89,37 @@ const OrderManagement = () => {
 
       {detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card rounded-xl border border-border w-full max-w-lg max-h-[80vh] overflow-y-auto p-6">
+          <div className="bg-card rounded-xl border border-border w-full max-w-lg max-h-[80vh] overflow-y-auto p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">Order {detail.order_number}</h3>
-              <button onClick={() => setSelectedOrder(null)}><X className="h-5 w-5" /></button>
+              <h3 className="text-lg font-bold">Order {detail.orderNumber}</h3>
+              <button onClick={() => setSelectedId(null)}><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-2">
-                <div><span className="text-muted-foreground">Date:</span> {new Date(detail.created_at).toLocaleString('en-IN')}</div>
-                <div><span className="text-muted-foreground">Payment:</span> {detail.payment_status}</div>
-                <div><span className="text-muted-foreground">Status:</span> <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[detail.status]}`}>{detail.status.replace(/_/g, ' ')}</span></div>
-                <div><span className="text-muted-foreground">Total:</span> <strong>₹{detail.total_amount}</strong></div>
+                <div><span className="text-muted-foreground">Customer:</span> {detail.customerName}</div>
+                <div><span className="text-muted-foreground">Email:</span> {detail.customerEmail}</div>
+                <div><span className="text-muted-foreground">Phone:</span> {detail.phone}</div>
+                <div><span className="text-muted-foreground">Payment:</span> {detail.paymentMethod} ({detail.paymentStatus})</div>
+                <div><span className="text-muted-foreground">Address:</span> {detail.address}, {detail.city} - {detail.pincode}</div>
+                <div><span className="text-muted-foreground">Total:</span> <strong>₹{detail.totalAmount}</strong></div>
               </div>
               <hr className="border-border" />
               <div>
                 <p className="font-medium mb-1">Items</p>
-                {(detail.order_items || []).map((item: any) => (
-                  <div key={item.id} className="flex justify-between py-1">
-                    <span>{item.product_name} × {item.quantity}</span>
-                    <span>₹{Number(item.price) * item.quantity}</span>
+                {detail.items.map((item, i) => (
+                  <div key={i} className="flex justify-between py-1">
+                    <span>{item.productName} ({item.variantSku}) × {item.qty}</span>
+                    <span>₹{item.price * item.qty}</span>
                   </div>
                 ))}
               </div>
-              {detail.user_addresses && (
-                <>
-                  <hr className="border-border" />
-                  <div>
-                    <p className="font-medium mb-1">Shipping Address</p>
-                    <p>{detail.user_addresses.name}, {detail.user_addresses.address_line1}</p>
-                    <p className="text-muted-foreground">{detail.user_addresses.city} - {detail.user_addresses.pincode}</p>
-                    {detail.user_addresses.phone && <p className="text-muted-foreground">{detail.user_addresses.phone}</p>}
-                  </div>
-                </>
-              )}
               <hr className="border-border" />
               <div>
                 <p className="font-medium mb-2">Update Status</p>
                 <div className="flex flex-wrap gap-2">
                   {allStatuses.map(s => (
                     <button key={s} onClick={() => updateStatus(detail.id, s)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium border ${detail.status === s ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}>
+                      className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors ${detail.status === s ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}>
                       {s.replace(/_/g, ' ')}
                     </button>
                   ))}
