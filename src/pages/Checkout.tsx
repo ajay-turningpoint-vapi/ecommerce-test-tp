@@ -136,7 +136,7 @@ const Checkout = () => {
                 ) : null}
 
                 {showAddressForm && (
-                  <div className="mt-4 rounded-lg border border-border p-6 max-w-lg">
+                  <div className="mt-4 rounded-lg border border-border p-4 md:p-6 max-w-lg">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-bold">Add New Address</h3>
                       <button onClick={() => setShowAddressForm(false)}><X className="h-5 w-5" /></button>
