@@ -80,9 +80,9 @@ const Header = () => {
             )}
           </div>
 
-          <Link to={user ? '/profile' : '/login'} className="hidden md:flex items-center gap-1 text-sm font-medium">
+          <Link to={user ? '/profile' : '/login'} className="flex items-center gap-1 text-sm font-medium">
             <User className="h-4 w-4" />
-            {user ? 'Profile' : 'Login'}
+            <span className="hidden md:inline">{user ? 'Profile' : 'Login'}</span>
           </Link>
 
           <Link
