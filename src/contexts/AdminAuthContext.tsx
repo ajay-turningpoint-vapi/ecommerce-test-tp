@@ -1,37 +1,65 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 
 interface AdminAuthContextType {
   isAdminLoggedIn: boolean;
-  adminLogin: (email: string, password: string) => boolean;
+  adminUser: AdminUser | null;
+  adminLogin: (email: string, password: string) => Promise<boolean>;
   adminLogout: () => void;
+  loading: boolean;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
-const ADMIN_EMAIL = 'admin@superbeauty.com';
-const ADMIN_PASSWORD = 'admin123';
-
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
-    return localStorage.getItem('adminLoggedIn') === 'true';
-  });
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem('adminLoggedIn', String(isAdminLoggedIn));
-  }, [isAdminLoggedIn]);
-
-  const adminLogin = (email: string, password: string) => {
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      setIsAdminLoggedIn(true);
-      return true;
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token));
+        if (payload.exp > Date.now()) {
+          setAdminUser({ id: payload.sub, name: payload.name, email: payload.email, role: payload.role });
+        } else {
+          localStorage.removeItem('adminToken');
+        }
+      } catch {
+        localStorage.removeItem('adminToken');
+      }
     }
-    return false;
+    setLoading(false);
+  }, []);
+
+  const adminLogin = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-login', {
+        body: { email, password },
+      });
+      if (error || !data?.token) return false;
+      localStorage.setItem('adminToken', data.token);
+      setAdminUser(data.admin);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
-  const adminLogout = () => setIsAdminLoggedIn(false);
+  const adminLogout = () => {
+    localStorage.removeItem('adminToken');
+    setAdminUser(null);
+  };
 
   return (
-    <AdminAuthContext.Provider value={{ isAdminLoggedIn, adminLogin, adminLogout }}>
+    <AdminAuthContext.Provider value={{ isAdminLoggedIn: !!adminUser, adminUser, adminLogin, adminLogout, loading }}>
       {children}
     </AdminAuthContext.Provider>
   );
