@@ -125,7 +125,7 @@ const Category = () => {
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
-  const hasMore = visibleCount < filteredProducts.length;
+  const hasMore = visibleCount < sortedProducts.length;
 
   const loadMore = useCallback(() => {
     if (loadingMore || !hasMore) return;
