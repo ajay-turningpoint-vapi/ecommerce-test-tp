@@ -358,6 +358,8 @@ const ProductDetail = () => {
           </section>
         )}
 
+        <RecentlyViewed excludeId={product?.id} />
+
         <PromoBanner image={freeShipping} title="Free Shipping on ₹499+" variant="horizontal" link="/category/bestsellers" className="mt-8" />
       </div>
       <Footer />
