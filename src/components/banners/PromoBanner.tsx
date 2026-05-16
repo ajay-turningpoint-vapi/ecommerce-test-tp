@@ -49,8 +49,8 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   return (
     <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
       {image ? (
-        <div className="aspect-[16/9] md:aspect-[21/7] md:max-h-[280px] lg:max-h-[320px] xl:max-h-[360px]">
-          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
+        <div className="w-full">
+          <img src={image} alt={title} className="w-full h-full object-cover rounded-2xl" loading="lazy" />
         </div>
       ) : (
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
