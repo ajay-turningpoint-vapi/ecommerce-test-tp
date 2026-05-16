@@ -130,6 +130,8 @@ const App = () => {
       </AdminAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
-);
+    </>
+  );
+};
 
 export default App;
