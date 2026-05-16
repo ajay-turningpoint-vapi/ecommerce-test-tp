@@ -25,8 +25,7 @@ export interface AdminProduct {
   brandId: string; shortDescription: string; fullDescription: string;
   status: 'active' | 'draft' | 'inactive'; discount: number;
   weight: string; deliveryTime: string; createdAt: string;
-  tags: string[]; ingredients: string; howToUse: string;
-  pieces: string; serves: string;
+  tags: string[]; specifications: { key: string; value: string }[];
 }
 
 export interface ProductVariant {
@@ -141,7 +140,7 @@ const attributes: Attribute[] = [
   { id: 'attr-6', name: 'SPF Level', type: 'text', values: ['SPF 15', 'SPF 30', 'SPF 50', 'SPF 50+'] },
 ];
 
-const d = { tags: [] as string[], ingredients: '', howToUse: '', pieces: '', serves: '' };
+const d = { tags: [] as string[], specifications: [] as { key: string; value: string }[] };
 const products: AdminProduct[] = [
   { ...d, id: 'prod-1', title: 'Lakmé Absolute Matte Lipstick', slug: 'lakme-matte-lipstick', categoryId: 'cat-s6', brandId: 'br-1', shortDescription: 'Long-lasting matte finish lipstick', fullDescription: 'Enriched with argan oil, this lipstick provides intense color with a comfortable matte finish that lasts up to 12 hours.', status: 'active', discount: 15, weight: '4.5g', deliveryTime: '2-3 days', createdAt: '2025-12-01', tags: ['Lipstick','Matte','Long-lasting'], ingredients: 'Argan Oil, Jojoba Oil, Vitamin E, Beeswax' },
   { ...d, id: 'prod-2', title: 'Vitamin C Brightening Serum', slug: 'vitamin-c-serum', categoryId: 'cat-s1', brandId: 'br-4', shortDescription: 'Brightening vitamin C face serum', fullDescription: 'A potent vitamin C serum that brightens, evens skin tone and reduces dark spots for a radiant complexion.', status: 'active', discount: 10, weight: '30ml', deliveryTime: '2-3 days', createdAt: '2025-12-05', tags: ['Serum','Brightening','Vitamin C'], ingredients: 'Vitamin C 15%, Hyaluronic Acid, Niacinamide', howToUse: 'Apply 3-4 drops on clean face. Gently pat until absorbed. Use morning and night.' },

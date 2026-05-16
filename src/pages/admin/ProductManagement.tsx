@@ -149,10 +149,7 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
   const [weight, setWeight] = useState(initial?.weight || '');
   const [deliveryTime, setDeliveryTime] = useState(initial?.deliveryTime || '2-3 days');
   const [tagsStr, setTagsStr] = useState((initial?.tags || []).join(', '));
-  const [ingredients, setIngredients] = useState(initial?.ingredients || '');
-  const [howToUse, setHowToUse] = useState(initial?.howToUse || '');
-  const [pieces, setPieces] = useState(initial?.pieces || '');
-  const [serves, setServes] = useState(initial?.serves || '');
+  const [specs, setSpecs] = useState<{ key: string; value: string }[]>(initial?.specifications?.length ? initial.specifications : [{ key: '', value: '' }]);
 
   const autoSlug = (val: string) => val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const parentCats = store.categories.filter(c => c.level === 0);
@@ -163,7 +160,8 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
       e.preventDefault();
       if (!title || !categoryId || !brandId) { toast.error('Title, category and brand are required'); return; }
       const tags = tagsStr.split(',').map(t => t.trim()).filter(Boolean);
-      onSave({ title, slug: slug || autoSlug(title), categoryId, brandId, shortDescription: shortDesc, fullDescription: fullDesc, status, discount, weight, deliveryTime, tags, ingredients, howToUse, pieces, serves });
+      const specifications = specs.filter(s => s.key.trim() && s.value.trim());
+      onSave({ title, slug: slug || autoSlug(title), categoryId, brandId, shortDescription: shortDesc, fullDescription: fullDesc, status, discount, weight, deliveryTime, tags, specifications });
     }} className="space-y-4">
       <div>
         <label className="block text-sm font-medium mb-1.5">Product Title *</label>
@@ -215,25 +213,18 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
           className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1.5">Key Ingredients</label>
-        <textarea value={ingredients} onChange={e => setIngredients(e.target.value)} placeholder="e.g. Vitamin C 15%, Hyaluronic Acid, Niacinamide" rows={2}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors resize-none" />
-      </div>
-      <div>
-        <label className="block text-sm font-medium mb-1.5">How to Use</label>
-        <textarea value={howToUse} onChange={e => setHowToUse(e.target.value)} placeholder="Usage instructions for the customer" rows={2}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors resize-none" />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Pieces</label>
-          <input value={pieces} onChange={e => setPieces(e.target.value)} placeholder="e.g. 12 shades"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Serves</label>
-          <input value={serves} onChange={e => setServes(e.target.value)} placeholder="e.g. 60 days"
-            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
+        <label className="block text-sm font-medium mb-1.5">Specifications</label>
+        <div className="space-y-2">
+          {specs.map((s, i) => (
+            <div key={i} className="flex gap-2 items-center">
+              <input value={s.key} onChange={e => { const n = [...specs]; n[i] = { ...n[i], key: e.target.value }; setSpecs(n); }} placeholder="Key (e.g. Ingredients)"
+                className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
+              <input value={s.value} onChange={e => { const n = [...specs]; n[i] = { ...n[i], value: e.target.value }; setSpecs(n); }} placeholder="Value"
+                className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
+              <button type="button" onClick={() => setSpecs(specs.filter((_, j) => j !== i))} className="text-destructive hover:text-destructive/80 p-1"><X className="h-4 w-4" /></button>
+            </div>
+          ))}
+          <button type="button" onClick={() => setSpecs([...specs, { key: '', value: '' }])} className="text-sm text-primary hover:underline">+ Add specification</button>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">

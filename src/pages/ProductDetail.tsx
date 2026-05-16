@@ -149,8 +149,6 @@ const ProductDetail = () => {
 
               <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1"><Package className="h-4 w-4" /> {product.weight}</span>
-                {product.pieces && <span className="flex items-center gap-1"><Layers className="h-4 w-4" /> {product.pieces}</span>}
-                {product.serves && <span className="flex items-center gap-1"><Users className="h-4 w-4" /> Serves {product.serves}</span>}
               </div>
 
               {product.discount >= 20 && (
@@ -164,17 +162,15 @@ const ProductDetail = () => {
 
               <p className="text-sm mt-4">{product.description}</p>
 
-              {product.ingredients && (
-                <div className="mt-4">
-                  <h3 className="text-sm font-bold">Key Ingredients</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{product.ingredients}</p>
-                </div>
-              )}
-
-              {product.howToUse && (
-                <div className="mt-3">
-                  <h3 className="text-sm font-bold">How to Use</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{product.howToUse}</p>
+              {product.specifications && product.specifications.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <h3 className="text-sm font-bold">Specifications</h3>
+                  {product.specifications.map((spec: { key: string; value: string }, i: number) => (
+                    <div key={i} className="flex gap-2 text-sm">
+                      <span className="font-medium min-w-[120px]">{spec.key}:</span>
+                      <span className="text-muted-foreground">{spec.value}</span>
+                    </div>
+                  ))}
                 </div>
               )}
 
