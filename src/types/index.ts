@@ -76,4 +76,5 @@ export interface Order {
   savings: number;
   date: string;
   status: string;
+  paymentId?: string;
 }
