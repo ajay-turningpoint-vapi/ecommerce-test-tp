@@ -90,6 +90,7 @@ const App = () => (
                   <Route path="/order/:id" element={<OrderConfirmation />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/search" element={<Search />} />
+                  <Route path="/categories" element={<Categories />} />
                   <Route path="/profile" element={<Profile />} />
 
                   {/* Admin Routes */}
