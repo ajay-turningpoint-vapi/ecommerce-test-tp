@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
 import { Search, Plus, Edit2, Trash2, X, Package, Layers, Image as ImageIcon, Tag, Eye } from 'lucide-react';
 import { store, addItem, updateItem, deleteItem, getCategoryName, getBrandName, getProductVariants, getVariantAttributes, getProductImages,
   type AdminProduct, type ProductVariant, type VariantAttributeValue, type ProductImage } from '@/data/adminStore';

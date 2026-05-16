@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
 import { CheckCircle, XCircle, Eye, X } from 'lucide-react';
 import { store } from '@/data/adminStore';
 import { toast } from 'sonner';

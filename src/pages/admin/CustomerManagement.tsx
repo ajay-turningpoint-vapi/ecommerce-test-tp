@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
 import { Search, Ban, CheckCircle, Eye, X } from 'lucide-react';
 import { store } from '@/data/adminStore';
 import { toast } from 'sonner';

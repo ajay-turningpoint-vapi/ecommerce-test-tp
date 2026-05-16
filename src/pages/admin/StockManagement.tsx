@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
 import { Search, AlertTriangle, Plus, X } from 'lucide-react';
 import { store, addItem, updateItem, type InventoryItem } from '@/data/adminStore';
 import { toast } from 'sonner';
