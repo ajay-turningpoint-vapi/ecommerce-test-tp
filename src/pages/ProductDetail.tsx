@@ -68,6 +68,9 @@ const ProductDetail = () => {
 
             <div>
               <h1 className="text-2xl font-bold">{product.name}</h1>
+              {product.brandName && (
+                <p className="text-sm font-medium text-primary mt-0.5">by {product.brandName}</p>
+              )}
               <p className="text-sm text-muted-foreground mt-1">{product.tags.join(' | ')}</p>
 
               <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">

@@ -27,6 +27,9 @@ const ProductCard = ({ product }: Props) => {
         <Link to={`/product/${product.slug}`}>
           <h3 className="text-sm font-semibold line-clamp-1">{product.name}</h3>
         </Link>
+        {product.brandName && (
+          <p className="text-[11px] text-muted-foreground font-medium">{product.brandName}</p>
+        )}
         <p className="text-xs text-muted-foreground mt-0.5">{product.weight}{product.pieces ? ` | ${product.pieces}` : ''}</p>
         <div className="flex items-center gap-2 mt-1.5">
           <span className="text-sm font-bold">₹{variant.price}</span>
