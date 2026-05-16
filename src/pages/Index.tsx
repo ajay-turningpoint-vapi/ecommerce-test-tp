@@ -18,11 +18,8 @@ const Index = () => {
 
   const allBanners = getBanners();
   const banners = allBanners
-    .filter(b => b.status === 'Active')
-    .sort((a, b) => a.position - b.position)
-    .map(b => ({ image: b.imageUrl, alt: b.title, link: b.link || undefined }));
-
-  const loading = false;
+    .filter(b => b.isActive)
+    .map(b => ({ image: b.image, alt: b.title, link: b.link || undefined }));
 
   const currentHits = products.slice(0, 5);
   const recommended = products.slice(5, 11);
@@ -32,13 +29,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Slider — all banners from DB */}
+      {/* Hero Slider */}
       <section className="mx-4 mt-4 md:mx-8">
-        {loading ? (
-          <BannerSkeleton variant="hero" />
-        ) : banners.length > 0 ? (
-          <BannerSlider banners={banners} />
-        ) : null}
+        {banners.length > 0 && <BannerSlider banners={banners} />}
       </section>
 
       {/* Current Hits */}
@@ -46,26 +39,17 @@ const Index = () => {
         <h2 className="text-lg font-bold">Our current hits</h2>
         <p className="text-sm text-muted-foreground">Here's what everyone's loving!</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4">
-          {loading
-            ? Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
-            : currentHits.map(p => <ProductCard key={p.id} product={p} />)}
+          {currentHits.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
       </section>
 
-      {/* Dual Banner Row — use first two banners if available */}
+      {/* Dual Banner Row */}
       {banners.length >= 2 && (
         <section className="mx-4 md:mx-8 mt-8">
-          {loading ? (
-            <div className="grid md:grid-cols-2 gap-4">
-              <BannerSkeleton variant="horizontal" />
-              <BannerSkeleton variant="horizontal" />
-            </div>
-          ) : (
-            <DualBanner
-              left={{ image: banners[0].image, title: banners[0].alt, subtitle: '', link: banners[0].link || '#' }}
-              right={{ image: banners[1].image, title: banners[1].alt, subtitle: '', link: banners[1].link || '#' }}
-            />
-          )}
+          <DualBanner
+            left={{ image: banners[0].image, title: banners[0].alt, subtitle: '', link: banners[0].link || '#' }}
+            right={{ image: banners[1].image, title: banners[1].alt, subtitle: '', link: banners[1].link || '#' }}
+          />
         </section>
       )}
 
@@ -75,26 +59,22 @@ const Index = () => {
         <p className="text-sm text-muted-foreground">Explore our wide range of beauty products!</p>
         <div className="mt-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
           <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-6 gap-y-4 pb-2 w-max [&>*]:snap-start">
-            {loading
-              ? Array.from({ length: 12 }).map((_, i) => <CategorySkeleton key={i} />)
-              : categories.map(cat => (
-                  <Link key={cat.id} to={`/category/${cat.slug}`} className="flex flex-col items-center gap-2 group w-20">
-                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
-                      <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
-                    </div>
-                    <span className="text-xs font-medium text-center line-clamp-2">{cat.name}</span>
-                  </Link>
-                ))}
+            {categories.map(cat => (
+              <Link key={cat.id} to={`/category/${cat.slug}`} className="flex flex-col items-center gap-2 group w-20">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
+                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <span className="text-xs font-medium text-center line-clamp-2">{cat.name}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Full-width Banner — use third banner if available */}
+      {/* Full-width Banner */}
       {banners.length >= 3 && (
         <section className="mx-4 md:mx-8 mt-8">
-          {loading ? <BannerSkeleton variant="horizontal" /> : (
-            <PromoBanner image={banners[2].image} title={banners[2].alt} subtitle="" cta="Shop Now" variant="full" link={banners[2].link || '#'} />
-          )}
+          <PromoBanner image={banners[2].image} title={banners[2].alt} subtitle="" cta="Shop Now" variant="full" link={banners[2].link || '#'} />
         </section>
       )}
 
@@ -104,29 +84,21 @@ const Index = () => {
         <p className="text-sm text-muted-foreground">Don't miss out on these offers!</p>
         <div className="grid grid-cols-2 md:grid-cols-[1fr_2fr_1fr] gap-4 mt-4">
           {banners.length >= 4 && (
-            loading ? <BannerSkeleton variant="vertical" className="hidden md:block" /> : (
-              <PromoBanner image={banners[3].image} title={banners[3].alt} subtitle="" variant="vertical" link={banners[3].link || '#'} className="hidden md:block" />
-            )
+            <PromoBanner image={banners[3].image} title={banners[3].alt} subtitle="" variant="vertical" link={banners[3].link || '#'} className="hidden md:block" />
           )}
           <div className="grid grid-cols-2 gap-4 col-span-2 md:col-span-1">
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-              : (trendingDeals.length > 0 ? trendingDeals.slice(0, 4) : currentHits.slice(0, 4)).map(p => <ProductCard key={p.id} product={p} />)}
+            {(trendingDeals.length > 0 ? trendingDeals.slice(0, 4) : currentHits.slice(0, 4)).map(p => <ProductCard key={p.id} product={p} />)}
           </div>
           {banners.length >= 5 && (
-            loading ? <BannerSkeleton variant="vertical" className="hidden md:block" /> : (
-              <PromoBanner image={banners[4].image} title={banners[4].alt} subtitle="" variant="vertical" link={banners[4].link || '#'} className="hidden md:block" />
-            )
+            <PromoBanner image={banners[4].image} title={banners[4].alt} subtitle="" variant="vertical" link={banners[4].link || '#'} className="hidden md:block" />
           )}
         </div>
       </section>
 
-      {/* Bottom Banner — use last banner */}
+      {/* Bottom Banner */}
       {banners.length >= 6 && (
         <section className="mx-4 md:mx-8 mt-8">
-          {loading ? <BannerSkeleton variant="horizontal" /> : (
-            <PromoBanner image={banners[banners.length - 1].image} title={banners[banners.length - 1].alt} variant="horizontal" link={banners[banners.length - 1].link || '#'} />
-          )}
+          <PromoBanner image={banners[banners.length - 1].image} title={banners[banners.length - 1].alt} variant="horizontal" link={banners[banners.length - 1].link || '#'} />
         </section>
       )}
 
@@ -135,9 +107,7 @@ const Index = () => {
         <h2 className="text-lg font-bold italic">Recommended for you</h2>
         <p className="text-sm text-muted-foreground">Picked just for you!</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4">
-          {loading
-            ? Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
-            : recommended.map(p => <ProductCard key={p.id} product={p} />)}
+          {recommended.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
       </section>
 
