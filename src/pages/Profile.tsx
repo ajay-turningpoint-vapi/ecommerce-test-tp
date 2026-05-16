@@ -150,6 +150,7 @@ const Profile = () => {
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'orders', label: 'Orders', icon: Package },
     { id: 'addresses', label: 'Addresses', icon: MapPin },
+    { id: 'help', label: 'Help & Support', icon: HelpCircle },
   ];
 
   const inputClass = (err?: string) => `w-full mt-1 rounded-lg border ${err ? 'border-destructive' : 'border-border'} px-3 py-2 text-sm bg-background`;
