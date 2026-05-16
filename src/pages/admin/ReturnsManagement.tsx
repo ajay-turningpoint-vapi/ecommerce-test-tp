@@ -14,6 +14,8 @@ const statusColors: Record<string, string> = {
 const ReturnsManagement = () => {
   const [returns, setReturns] = useState([...store.returns]);
   const [selected, setSelected] = useState<any>(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const updateStatus = (id: string, status: string) => {
     const r = store.returns.find(r => r.id === id);
@@ -34,7 +36,10 @@ const ReturnsManagement = () => {
             <th className="text-left px-4 py-3 font-medium">Actions</th>
           </tr></thead>
           <tbody>
-            {returns.map(r => (
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(returns.length / PAGE_SIZE));
+              const safePage = Math.min(page, totalPages);
+              return returns.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE).map(r => (
               <tr key={r.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 font-medium">{r.orderNumber}</td>
                 <td className="px-4 py-3 max-w-[150px] truncate">{r.productName}</td>
@@ -56,10 +61,11 @@ const ReturnsManagement = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ));})()}
           </tbody>
         </table>
         {returns.length === 0 && <p className="text-center text-muted-foreground py-8">No return requests</p>}
+        <AdminPagination currentPage={page} totalItems={returns.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
       </div>
 
       {selected && (

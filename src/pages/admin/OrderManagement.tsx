@@ -21,6 +21,8 @@ const OrderManagement = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const filtered = useMemo(() =>
     orders.filter(o => {
@@ -68,7 +70,11 @@ const OrderManagement = () => {
             <th className="text-left px-4 py-3 font-medium">Actions</th>
           </tr></thead>
           <tbody>
-            {filtered.map(o => (
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+              const safePage = Math.min(page, totalPages);
+              const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+              return paginated.map(o => (
               <tr key={o.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 font-medium">{o.orderNumber}</td>
                 <td className="px-4 py-3">{o.customerName}</td>
@@ -82,10 +88,11 @@ const OrderManagement = () => {
                   <button onClick={() => setSelectedId(o.id)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
                 </td>
               </tr>
-            ))}
+            ));})()}
           </tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">No orders found</p>}
+        <AdminPagination currentPage={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
       </div>
 
       {detail && (

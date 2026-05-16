@@ -8,6 +8,8 @@ const CustomerManagement = () => {
   const [customers, setCustomers] = useState([...store.customers]);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<any>(null);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const filtered = useMemo(() =>
     customers.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase())),
@@ -39,7 +41,10 @@ const CustomerManagement = () => {
             <th className="text-left px-4 py-3 font-medium">Actions</th>
           </tr></thead>
           <tbody>
-            {filtered.map(c => (
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+              const safePage = Math.min(page, totalPages);
+              return filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE).map(c => (
               <tr key={c.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 font-medium">{c.name}</td>
                 <td className="px-4 py-3">{c.email}</td>
@@ -58,10 +63,11 @@ const CustomerManagement = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ));})()}
           </tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">No customers found</p>}
+        <AdminPagination currentPage={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
       </div>
 
       {selected && (

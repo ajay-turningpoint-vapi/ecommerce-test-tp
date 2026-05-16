@@ -15,6 +15,8 @@ const statusColors: Record<string, string> = {
 const ShippingManagement = () => {
   const shipments = store.shipments;
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const filtered = useMemo(() =>
     shipments.filter(s => s.orderNumber.toLowerCase().includes(search.toLowerCase()) || s.trackingNumber.toLowerCase().includes(search.toLowerCase())),
@@ -41,7 +43,10 @@ const ShippingManagement = () => {
             <th className="text-left px-4 py-3 font-medium">Actions</th>
           </tr></thead>
           <tbody>
-            {filtered.map(s => (
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+              const safePage = Math.min(page, totalPages);
+              return filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE).map(s => (
               <tr key={s.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 font-medium">{s.orderNumber}</td>
                 <td className="px-4 py-3">{s.courier}</td>
@@ -56,10 +61,11 @@ const ShippingManagement = () => {
                   </div>
                 </td>
               </tr>
-            ))}
+            ));})()}
           </tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">No shipments found</p>}
+        <AdminPagination currentPage={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
       </div>
     </div>
   );

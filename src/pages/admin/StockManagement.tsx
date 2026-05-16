@@ -11,6 +11,8 @@ const StockManagement = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'low'>('all');
   const [showForm, setShowForm] = useState(false);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   const refresh = useCallback(() => setInventory([...store.inventory]), []);
 
@@ -79,7 +81,10 @@ const StockManagement = () => {
             <th className="text-left px-4 py-3 font-medium">Update Stock</th>
           </tr></thead>
           <tbody>
-            {filtered.map(s => {
+            {(() => {
+              const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+              const safePage = Math.min(page, totalPages);
+              return filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE).map(s => {
               const variant = store.variants.find(v => v.id === s.variantId);
               const product = variant ? store.products.find(p => p.id === variant.productId) : null;
               const warehouse = store.warehouses.find(w => w.id === s.warehouseId);
@@ -104,10 +109,11 @@ const StockManagement = () => {
                   </td>
                 </tr>
               );
-            })}
+            });})()}
           </tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">No inventory records</p>}
+        <AdminPagination currentPage={page} totalItems={filtered.length} pageSize={PAGE_SIZE} onPageChange={setPage} />
       </div>
 
       {showForm && (
