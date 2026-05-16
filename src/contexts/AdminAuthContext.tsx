@@ -41,12 +41,14 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const adminLogin = async (email: string, password: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase.functions.invoke('admin-login', {
-        body: { email, password },
+      const { data, error } = await supabase.rpc('admin_login', {
+        p_email: email,
+        p_password: password,
       });
-      if (error || !data?.token) return false;
-      localStorage.setItem('adminToken', data.token);
-      setAdminUser(data.admin);
+      if (error || !data || data.error) return false;
+      const result = data as any;
+      localStorage.setItem('adminToken', result.token);
+      setAdminUser(result.admin);
       return true;
     } catch {
       return false;
