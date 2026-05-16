@@ -4,8 +4,8 @@ const Preloader = ({ onComplete }: { onComplete: () => void }) => {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setFadeOut(true), 1800);
-    const remove = setTimeout(onComplete, 2300);
+    const timer = setTimeout(() => setFadeOut(true), 800);
+    const remove = setTimeout(onComplete, 1100);
     return () => { clearTimeout(timer); clearTimeout(remove); };
   }, [onComplete]);
 

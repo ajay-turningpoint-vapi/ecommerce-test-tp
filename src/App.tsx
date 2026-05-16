@@ -6,8 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
-import { lazy, Suspense, useState, useCallback } from "react";
+import { lazy, Suspense, useState, useCallback, useEffect } from "react";
 import Preloader from "@/components/Preloader";
+import { prefetchRoutes } from "@/lib/prefetchRoutes";
 import ScrollToTop from "@/components/ScrollToTop";
 import BottomNav from "@/components/BottomNav";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -75,6 +76,8 @@ const PageFallback = () => (
 const App = () => {
   const [loading, setLoading] = useState(true);
   const handleComplete = useCallback(() => setLoading(false), []);
+
+  useEffect(() => { prefetchRoutes(); }, []);
 
   return (
     <>
