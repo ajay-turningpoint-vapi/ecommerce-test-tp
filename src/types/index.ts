@@ -55,12 +55,15 @@ export interface CartItem {
 
 export interface Address {
   id: string;
-  pincode: string;
-  house: string;
-  road: string;
   name: string;
   phone: string;
   email: string;
+  house: string;
+  road: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  pincode: string;
   isDefault: boolean;
 }
 
