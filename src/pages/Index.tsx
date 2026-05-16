@@ -87,8 +87,8 @@ const Index = () => {
       <section className="container mx-auto px-4 mt-8">
         <h2 className="text-lg font-bold">What's trending today?</h2>
         <p className="text-sm text-muted-foreground">Explore our wide range of beauty products!</p>
-        <div className="mt-6 overflow-x-auto scrollbar-hide">
-          <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-6 gap-y-4 pb-2 w-max">
+        <div className="mt-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth">
+          <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-6 gap-y-4 pb-2 w-max [&>*]:snap-start">
             {loading
               ? Array.from({ length: 12 }).map((_, i) => <CategorySkeleton key={i} />)
               : categories.map(cat => (
