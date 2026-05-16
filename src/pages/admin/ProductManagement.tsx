@@ -78,7 +78,56 @@ const ProductManagement = () => {
                 <th className="text-left px-4 py-3 font-medium">Status</th>
                 <th className="text-left px-4 py-3 font-medium">Actions</th>
               </tr></thead>
-              <PaginatedProductTable filtered={filtered} setManagingProduct={setManagingProduct} setEditing={setEditing} setShowForm={setShowForm} remove={remove} />
+              <tbody>
+                {(() => {
+                  const pageSize = 10;
+                  const [page, setPage] = [_prodPage, _setProdPage];
+                  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+                  const safePage = Math.min(page, totalPages);
+                  const paginated = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
+                  return (<>
+                    {paginated.map(p => {
+                      const pvs = getProductVariants(p.id);
+                      const defaultV = pvs.find(v => v.isDefault) || pvs[0];
+                      return (
+                        <tr key={p.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                                <Package className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                              <div>
+                                <p className="font-medium max-w-[200px] truncate">{p.title}</p>
+                                <p className="text-xs text-muted-foreground font-mono">/{p.slug}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-muted-foreground">{getCategoryName(p.categoryId)}</td>
+                          <td className="px-4 py-3 text-muted-foreground">{getBrandName(p.brandId)}</td>
+                          <td className="px-4 py-3">{pvs.length}</td>
+                          <td className="px-4 py-3">₹{defaultV?.price || 0}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${p.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : p.status === 'draft' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-muted text-muted-foreground'}`}>
+                              {p.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex gap-1">
+                              <button onClick={() => setManagingProduct(p)} className="p-1.5 rounded hover:bg-muted transition-colors" title="Manage"><Eye className="h-4 w-4" /></button>
+                              <button onClick={() => { setEditing(p); setShowForm(true); }} className="p-1.5 rounded hover:bg-muted transition-colors"><Edit2 className="h-4 w-4" /></button>
+                              <button onClick={() => remove(p.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive transition-colors"><Trash2 className="h-4 w-4" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </>);
+                })()}
+              </tbody>
+            </table>
+            {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">No products found</p>}
+            <AdminPagination currentPage={_prodPage} totalItems={filtered.length} pageSize={10} onPageChange={_setProdPage} />
+          </div>
 
           {showForm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
