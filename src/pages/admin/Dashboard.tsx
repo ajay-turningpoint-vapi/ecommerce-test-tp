@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { ShoppingCart, IndianRupee, Users, Clock, RotateCcw, AlertTriangle, Package, Layers } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { products, categories, getOrders, getStock, getCustomers } from '@/data/adminSharedData';
+import { useAdminStore } from '@/hooks/useAdminStore';
 
 const LOW_STOCK_THRESHOLD = 10;
 
