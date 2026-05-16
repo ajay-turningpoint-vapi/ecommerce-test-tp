@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Order, Address } from '@/types';
+import OrderTracker from '@/components/OrderTracker';
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
