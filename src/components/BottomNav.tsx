@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 
 const BottomNav = () => {
   const location = useLocation();
+
+  if (location.pathname.startsWith('/admin')) return null;
   const { totalItems } = useCart();
   const { user } = useAuth();
 
