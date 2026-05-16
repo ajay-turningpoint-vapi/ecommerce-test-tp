@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import ProductImageGallery from '@/components/ProductImageGallery';
 import { useState, useEffect, useMemo } from 'react';
 import { Package, Layers, Users, Truck, Plus, Minus } from 'lucide-react';
 import Header from '@/components/Header';
