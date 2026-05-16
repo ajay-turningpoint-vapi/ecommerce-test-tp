@@ -18,31 +18,41 @@ const Index = () => {
   const { data: catData, isLoading: catsLoading } = useDbCategories();
   const categories = catData?.categories || [];
 
-  const loading = productsLoading || catsLoading;
+  const { data: banners = [], isLoading: bannersLoading } = useQuery({
+    queryKey: ['banners-home'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('banners')
+        .select('*')
+        .eq('status', 'active')
+        .order('position');
+      if (error) throw error;
+      return (data || []).map(b => ({
+        image: b.image_url,
+        alt: b.title,
+        link: b.link || undefined,
+      }));
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const loading = productsLoading || catsLoading || bannersLoading;
 
   const currentHits = products.slice(0, 5);
   const recommended = products.slice(5, 11);
   const trendingDeals = products.slice(11, 16);
 
-  const heroSlides = [
-    { image: heroBanner, alt: 'Premium Beauty Products' },
-    { image: sale50, alt: 'Flat 50% Off Sale' },
-    { image: newArrivals, alt: 'New Arrivals' },
-    { image: glowUp, alt: 'Glow Up Sale' },
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Hero Slider */}
+      {/* Hero Slider — all banners from DB */}
       <section className="mx-4 mt-4 md:mx-8">
-        {loading ? <BannerSkeleton variant="hero" /> : <BannerSlider banners={heroSlides} />}
-      </section>
-
-      {/* Small Strip Banner */}
-      <section className="mx-4 md:mx-8 mt-4">
-        {loading ? <BannerSkeleton variant="small" /> : <PromoBanner title="Free Shipping" subtitle="on orders above ₹499" variant="small" link="/category/skincare" />}
+        {loading ? (
+          <BannerSkeleton variant="hero" />
+        ) : banners.length > 0 ? (
+          <BannerSlider banners={banners} />
+        ) : null}
       </section>
 
       {/* Current Hits */}
@@ -56,25 +66,22 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Dual Banner Row */}
-      <section className="mx-4 md:mx-8 mt-8">
-        {loading ? (
-          <div className="grid md:grid-cols-2 gap-4">
-            <BannerSkeleton variant="horizontal" />
-            <BannerSkeleton variant="horizontal" />
-          </div>
-        ) : (
-          <DualBanner
-            left={{ image: sale50, title: 'Mega Sale', subtitle: 'Up to 50% off', link: '/category/skincare' }}
-            right={{ image: hairCare, title: 'Hair Care Week', subtitle: 'Best deals on hair products', link: '/category/haircare' }}
-          />
-        )}
-      </section>
-
-      {/* Promo Banner */}
-      <section className="mx-4 md:mx-8 mt-6">
-        {loading ? <BannerSkeleton variant="small" /> : <PromoBanner title="Glowing Skin Essentials" subtitle="all under ₹499" variant="small" link="/category/skincare" bgColor="bg-primary" />}
-      </section>
+      {/* Dual Banner Row — use first two banners if available */}
+      {banners.length >= 2 && (
+        <section className="mx-4 md:mx-8 mt-8">
+          {loading ? (
+            <div className="grid md:grid-cols-2 gap-4">
+              <BannerSkeleton variant="horizontal" />
+              <BannerSkeleton variant="horizontal" />
+            </div>
+          ) : (
+            <DualBanner
+              left={{ image: banners[0].image, title: banners[0].alt, subtitle: '', link: banners[0].link || '#' }}
+              right={{ image: banners[1].image, title: banners[1].alt, subtitle: '', link: banners[1].link || '#' }}
+            />
+          )}
+        </section>
+      )}
 
       {/* Categories */}
       <section className="container mx-auto px-4 mt-8">
@@ -96,30 +103,46 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Full-width Banner */}
-      <section className="mx-4 md:mx-8 mt-8">
-        {loading ? <BannerSkeleton variant="horizontal" /> : <PromoBanner image={newArrivals} title="New Arrivals" subtitle="Discover the latest beauty trends" cta="Shop Now" variant="full" link="/category/new-arrivals" />}
-      </section>
+      {/* Full-width Banner — use third banner if available */}
+      {banners.length >= 3 && (
+        <section className="mx-4 md:mx-8 mt-8">
+          {loading ? <BannerSkeleton variant="horizontal" /> : (
+            <PromoBanner image={banners[2].image} title={banners[2].alt} subtitle="" cta="Shop Now" variant="full" link={banners[2].link || '#'} />
+          )}
+        </section>
+      )}
 
       {/* Top Deals */}
       <section className="container mx-auto px-4 mt-8">
         <h2 className="text-lg font-bold">Top Deals</h2>
         <p className="text-sm text-muted-foreground">Don't miss out on these offers!</p>
         <div className="grid grid-cols-2 md:grid-cols-[1fr_2fr_1fr] gap-4 mt-4">
-          {loading ? <BannerSkeleton variant="vertical" className="hidden md:block" /> : <PromoBanner image={fragrances} title="Exclusive Fragrances" subtitle="Starting ₹299" variant="vertical" link="/category/fragrance" className="hidden md:block" />}
+          {banners.length >= 4 && (
+            loading ? <BannerSkeleton variant="vertical" className="hidden md:block" /> : (
+              <PromoBanner image={banners[3].image} title={banners[3].alt} subtitle="" variant="vertical" link={banners[3].link || '#'} className="hidden md:block" />
+            )
+          )}
           <div className="grid grid-cols-2 gap-4 col-span-2 md:col-span-1">
             {loading
               ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
               : (trendingDeals.length > 0 ? trendingDeals.slice(0, 4) : currentHits.slice(0, 4)).map(p => <ProductCard key={p.id} product={p} />)}
           </div>
-          {loading ? <BannerSkeleton variant="vertical" className="hidden md:block" /> : <PromoBanner image={lipFest} title="Lip Fest" subtitle="All lip products on sale" variant="vertical" link="/category/lip-care" className="hidden md:block" />}
+          {banners.length >= 5 && (
+            loading ? <BannerSkeleton variant="vertical" className="hidden md:block" /> : (
+              <PromoBanner image={banners[4].image} title={banners[4].alt} subtitle="" variant="vertical" link={banners[4].link || '#'} className="hidden md:block" />
+            )
+          )}
         </div>
       </section>
 
-      {/* Glow Up Banner */}
-      <section className="mx-4 md:mx-8 mt-8">
-        {loading ? <BannerSkeleton variant="horizontal" /> : <PromoBanner image={glowUp} title="Glow Up Sale" subtitle="Skincare at unbeatable prices" cta="Explore" variant="full" link="/category/skincare" />}
-      </section>
+      {/* Bottom Banner — use last banner */}
+      {banners.length >= 6 && (
+        <section className="mx-4 md:mx-8 mt-8">
+          {loading ? <BannerSkeleton variant="horizontal" /> : (
+            <PromoBanner image={banners[banners.length - 1].image} title={banners[banners.length - 1].alt} variant="horizontal" link={banners[banners.length - 1].link || '#'} />
+          )}
+        </section>
+      )}
 
       {/* Recommended */}
       <section className="container mx-auto px-4 mt-8">
@@ -130,11 +153,6 @@ const Index = () => {
             ? Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
             : recommended.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
-      </section>
-
-      {/* Bottom Banner */}
-      <section className="mx-4 md:mx-8 mt-8">
-        {loading ? <BannerSkeleton variant="horizontal" /> : <PromoBanner image={freeShipping} title="Free Shipping on ₹499+" variant="horizontal" link="/category/bestsellers" />}
       </section>
 
       <Footer />
