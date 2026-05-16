@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
@@ -11,14 +10,8 @@ import BannerSkeleton from '@/components/skeletons/BannerSkeleton';
 import CategorySkeleton from '@/components/skeletons/CategorySkeleton';
 import { useDbProducts } from '@/hooks/useDbProducts';
 import { useDbCategories } from '@/hooks/useDbCategories';
-import heroBanner from '@/assets/hero-banner.jpg';
-import sale50 from '@/assets/banners/sale-50-off.jpg';
-import newArrivals from '@/assets/banners/new-arrivals.jpg';
-import glowUp from '@/assets/banners/glow-up-sale.jpg';
-import freeShipping from '@/assets/banners/free-shipping.jpg';
-import fragrances from '@/assets/banners/fragrances-vertical.jpg';
-import lipFest from '@/assets/banners/lip-fest-vertical.jpg';
-import hairCare from '@/assets/banners/hair-care-week.jpg';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { data: products = [], isLoading: productsLoading } = useDbProducts();
