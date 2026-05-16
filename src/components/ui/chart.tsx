@@ -90,8 +90,9 @@ ${colorConfig
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
 const ChartTooltipContent = React.forwardRef<
+  HTMLDivElement,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  any
+  Record<string, any>
 >(
   (
     {
