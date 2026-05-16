@@ -149,31 +149,38 @@ const ProductDetail = () => {
           <div className="grid md:grid-cols-2 gap-8">
             {(() => {
               const baseImages = product.images?.length ? product.images : [product.image];
+              const numVariants = product.variants.length;
+
+              // Build a per-variant image for each variant: prefer explicit
+              // variant.image, otherwise a generated swatch when there are
+              // multiple variants (so each shade looks distinct).
+              const variantImages = product.variants.map(v =>
+                v.image || (numVariants > 1 ? generateVariantSwatch(v.name, product.name) : '')
+              ).filter(Boolean) as string[];
+
+              // Same-category extras as additional context shots
               const sameCat = products
                 .filter(p => p.categoryId === product.categoryId && p.id !== product.id)
                 .map(p => p.image);
               const extras: string[] = [];
               for (const img of sameCat) {
-                if (extras.length >= Math.max(0, product.variants.length + 2 - baseImages.length)) break;
+                if (extras.length >= 2) break;
                 if (!baseImages.includes(img) && !extras.includes(img)) extras.push(img);
               }
-              const allImages = [...baseImages, ...extras];
 
-              // Build a per-variant gallery: rotate so the variant's "primary"
-              // image is shown first, with the rest available as thumbnails.
-              const numVariants = product.variants.length;
-              let variantGallery = allImages;
-              if (numVariants > 1 && allImages.length > 1) {
-                const primaryIdx = selectedVariant % allImages.length;
-                variantGallery = [
-                  allImages[primaryIdx],
-                  ...allImages.filter((_, i) => i !== primaryIdx),
-                ];
-              }
+              // Gallery = [current variant image, base product images, other variant images, extras]
+              const currentVariantImg = variantImages[selectedVariant];
+              const otherVariantImgs = variantImages.filter((_, i) => i !== selectedVariant);
+              const ordered: string[] = [];
+              const push = (img: string) => { if (img && !ordered.includes(img)) ordered.push(img); };
+              if (currentVariantImg) push(currentVariantImg);
+              baseImages.forEach(push);
+              otherVariantImgs.forEach(push);
+              extras.forEach(push);
 
               return (
                 <ProductImageGallery
-                  images={variantGallery}
+                  images={ordered}
                   name={product.name}
                   resetKey={variant.id}
                 />
