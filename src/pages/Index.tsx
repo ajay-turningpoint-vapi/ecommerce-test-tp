@@ -87,17 +87,19 @@ const Index = () => {
       <section className="container mx-auto px-4 mt-8">
         <h2 className="text-lg font-bold">What's trending today?</h2>
         <p className="text-sm text-muted-foreground">Explore our wide range of beauty products!</p>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-6 mt-6">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => <CategorySkeleton key={i} />)
-            : categories.map(cat => (
-                <Link key={cat.id} to={`/category/${cat.slug}`} className="flex flex-col items-center gap-2 group">
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
-                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
-                  </div>
-                  <span className="text-xs font-medium text-center">{cat.name}</span>
-                </Link>
-              ))}
+        <div className="mt-6 overflow-x-auto scrollbar-hide">
+          <div className="grid grid-rows-2 grid-flow-col gap-x-6 gap-y-4 pb-2" style={{ gridAutoColumns: 'max-content' }}>
+            {loading
+              ? Array.from({ length: 12 }).map((_, i) => <CategorySkeleton key={i} />)
+              : categories.map(cat => (
+                  <Link key={cat.id} to={`/category/${cat.slug}`} className="flex flex-col items-center gap-2 group w-20">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
+                      <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                    <span className="text-xs font-medium text-center line-clamp-2">{cat.name}</span>
+                  </Link>
+                ))}
+          </div>
         </div>
       </section>
 
