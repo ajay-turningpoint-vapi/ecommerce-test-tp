@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +19,21 @@ const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const Login = lazy(() => import("./pages/Login"));
 const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+
+// Admin pages
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const OrderManagement = lazy(() => import("./pages/admin/OrderManagement"));
+const ProductManagement = lazy(() => import("./pages/admin/ProductManagement"));
+const CategoryManagement = lazy(() => import("./pages/admin/CategoryManagement"));
+const StockManagement = lazy(() => import("./pages/admin/StockManagement"));
+const CustomerManagement = lazy(() => import("./pages/admin/CustomerManagement"));
+const ShippingManagement = lazy(() => import("./pages/admin/ShippingManagement"));
+const ReturnsManagement = lazy(() => import("./pages/admin/ReturnsManagement"));
+const BannerManagement = lazy(() => import("./pages/admin/BannerManagement"));
+const Reports = lazy(() => import("./pages/admin/Reports"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 
 const queryClient = new QueryClient();
 
@@ -50,28 +66,47 @@ const PageFallback = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={<PageFallback />}>
-              <ScrollToTop />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/category/:slug" element={<Category />} />
-                <Route path="/product/:slug" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order/:id" element={<OrderConfirmation />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CartProvider>
+      <AdminAuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<PageFallback />}>
+                <ScrollToTop />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/category/:slug" element={<Category />} />
+                  <Route path="/product/:slug" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/order/:id" element={<OrderConfirmation />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/profile" element={<Profile />} />
+
+                  {/* Admin Routes */}
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="orders" element={<OrderManagement />} />
+                    <Route path="products" element={<ProductManagement />} />
+                    <Route path="categories" element={<CategoryManagement />} />
+                    <Route path="stock" element={<StockManagement />} />
+                    <Route path="customers" element={<CustomerManagement />} />
+                    <Route path="shipping" element={<ShippingManagement />} />
+                    <Route path="returns" element={<ReturnsManagement />} />
+                    <Route path="banners" element={<BannerManagement />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="settings" element={<AdminSettings />} />
+                  </Route>
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CartProvider>
+      </AdminAuthProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
