@@ -42,7 +42,7 @@ const Header = () => {
         </div>
 
         <div className="hidden md:flex flex-1 max-w-lg">
-          <div className="relative w-full">
+          <form className="relative w-full" onSubmit={e => { e.preventDefault(); if (search.trim()) navigate(`/search?q=${encodeURIComponent(search.trim())}`); }}>
             <input
               type="text"
               placeholder="Search for any beauty product..."
@@ -50,8 +50,10 @@ const Header = () => {
               onChange={e => setSearch(e.target.value)}
               className="w-full rounded-lg border border-border bg-background px-4 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          </div>
+            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </form>
         </div>
 
         <div className="flex items-center gap-4 shrink-0">
@@ -99,7 +101,7 @@ const Header = () => {
 
       {/* Mobile search bar on second line */}
       <div className="md:hidden px-4 pb-3">
-        <div className="relative">
+        <form className="relative" onSubmit={e => { e.preventDefault(); if (search.trim()) navigate(`/search?q=${encodeURIComponent(search.trim())}`); }}>
           <input
             type="text"
             placeholder="Search for any beauty product..."
@@ -107,8 +109,10 @@ const Header = () => {
             onChange={e => setSearch(e.target.value)}
             className="w-full rounded-lg border border-border bg-background px-4 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
+          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </form>
       </div>
     </header>
   );

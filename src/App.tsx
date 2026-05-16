@@ -18,6 +18,7 @@ const Checkout = lazy(() => import("./pages/Checkout"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const Login = lazy(() => import("./pages/Login"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Search = lazy(() => import("./pages/Search"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Admin pages
@@ -85,6 +86,7 @@ const App = () => (
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/order/:id" element={<OrderConfirmation />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/search" element={<Search />} />
                   <Route path="/profile" element={<Profile />} />
 
                   {/* Admin Routes */}
