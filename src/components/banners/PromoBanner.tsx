@@ -52,6 +52,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
         <div className="aspect-video">
           <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
         </div>
+      ) : (
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
           <div>
             <h3 className="text-sm md:text-base font-bold">{title}</h3>
