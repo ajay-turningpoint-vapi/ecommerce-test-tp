@@ -357,6 +357,12 @@ const returns: DummyReturn[] = orders
     refundAmount: o.totalAmount,
   }));
 
+const discounts: Discount[] = [
+  { id: 'disc-1', name: 'Lipstick Mega Sale', applyTo: 'category', targetId: 'cat-s6', variantId: null, discountType: 'percentage', value: 20, minOrderValue: 500, maxDiscount: 200, usageLimit: 1000, startDate: '2026-05-01', endDate: '2026-05-10', status: 'active' },
+  { id: 'disc-2', name: 'Lakmé Brand Offer', applyTo: 'brand', targetId: 'br-1', variantId: null, discountType: 'percentage', value: 15, minOrderValue: null, maxDiscount: null, usageLimit: null, startDate: '2026-04-01', endDate: '2026-04-30', status: 'active' },
+  { id: 'disc-3', name: 'Serum Flat ₹100 Off', applyTo: 'product', targetId: 'prod-2', variantId: null, discountType: 'flat', value: 100, minOrderValue: 799, maxDiscount: null, usageLimit: 500, startDate: '2026-04-10', endDate: '2026-04-20', status: 'inactive' },
+];
+
 // ─── STORE (mutable in-memory) ───
 
 export const store = {
@@ -374,6 +380,7 @@ export const store = {
   customers: [...customers],
   shipments: [...shipments],
   returns: [...returns],
+  discounts: [...discounts],
 };
 
 // ─── CRUD HELPERS ───

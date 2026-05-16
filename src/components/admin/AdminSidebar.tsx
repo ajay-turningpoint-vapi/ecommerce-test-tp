@@ -35,7 +35,10 @@ const navGroups = [
   },
   {
     label: 'Marketing',
-    items: [{ label: 'Banners', icon: Image, path: '/admin/banners' }],
+    items: [
+      { label: 'Banners', icon: Image, path: '/admin/banners' },
+      { label: 'Discounts', icon: Percent, path: '/admin/discounts' },
+    ],
   },
   {
     label: 'People',
