@@ -75,7 +75,7 @@ const Index = () => {
 
       {/* Full-width Banner */}
       {banners.length >= 3 && (
-        <section className="mx-4 md:mx-6 mt-8">
+        <section className="container mx-auto px-4 mt-8">
           <PromoBanner image={banners[2].image} title={banners[2].alt} subtitle="" cta="Shop Now" variant="full" link={banners[2].link || '#'} />
         </section>
       )}
@@ -99,7 +99,7 @@ const Index = () => {
 
       {/* Bottom Banner */}
       {banners.length >= 6 && (
-        <section className="mx-4 md:mx-6 mt-8">
+        <section className="container mx-auto px-4 mt-8">
           <PromoBanner image={banners[banners.length - 1].image} title={banners[banners.length - 1].alt} variant="horizontal" link={banners[banners.length - 1].link || '#'} />
         </section>
       )}
