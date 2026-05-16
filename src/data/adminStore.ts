@@ -79,6 +79,14 @@ export interface DummyReturn {
   status: string; requestDate: string; refundAmount: number;
 }
 
+export interface Discount {
+  id: string; name: string; applyTo: 'product' | 'category' | 'brand';
+  targetId: string; variantId: string | null;
+  discountType: 'percentage' | 'flat'; value: number;
+  minOrderValue: number | null; maxDiscount: number | null; usageLimit: number | null;
+  startDate: string; endDate: string; status: 'active' | 'inactive';
+}
+
 // ─── SEED DATA ───
 
 const categories: Category[] = [
