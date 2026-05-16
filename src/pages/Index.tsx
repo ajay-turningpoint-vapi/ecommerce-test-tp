@@ -88,8 +88,7 @@ const Index = () => {
         <h2 className="text-lg font-bold">What's trending today?</h2>
         <p className="text-sm text-muted-foreground">Explore our wide range of beauty products!</p>
         <div className="mt-6 overflow-x-auto scrollbar-hide">
-          <div className="flex flex-wrap gap-x-6 gap-y-4 pb-2" style={{ maxHeight: '13rem', overflowY: 'hidden' }}>
-            <div className="flex flex-wrap gap-x-6 gap-y-4 min-w-max">
+          <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-6 gap-y-4 pb-2 w-max">
             {loading
               ? Array.from({ length: 12 }).map((_, i) => <CategorySkeleton key={i} />)
               : categories.map(cat => (
