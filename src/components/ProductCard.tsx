@@ -23,7 +23,7 @@ const ProductCard = ({ product }: Props) => {
           className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {product.variants.length > 1 ? (
-          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+          <span className="absolute bottom-3 right-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground shadow-sm">
             View Variants
           </span>
         ) : qty === 0 ? (
