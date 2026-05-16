@@ -320,7 +320,7 @@ const Category = () => {
           </button>
         </div>
 
-        <p className="text-sm text-muted-foreground mt-3">{filteredProducts.length} items available</p>
+        <p className="text-sm text-muted-foreground mt-3">{sortedProducts.length} items available</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           {loading
@@ -339,11 +339,11 @@ const Category = () => {
           </div>
         )}
 
-        {!hasMore && !loading && filteredProducts.length > ITEMS_PER_PAGE && (
-          <p className="text-center text-sm text-muted-foreground py-6">You've seen all {filteredProducts.length} products</p>
+        {!hasMore && !loading && sortedProducts.length > ITEMS_PER_PAGE && (
+          <p className="text-center text-sm text-muted-foreground py-6">You've seen all {sortedProducts.length} products</p>
         )}
 
-        {!loading && filteredProducts.length === 0 && activeFilterCount > 0 && (
+        {!loading && sortedProducts.length === 0 && activeFilterCount > 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No products match the selected filters</p>
             <button onClick={clearFilters} className="text-primary text-sm font-medium mt-2">Clear filters</button>
