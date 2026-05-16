@@ -21,7 +21,7 @@ const BannerSlider = ({ banners, autoPlay = true, interval = 3500, className = '
     <div className={`relative rounded-2xl overflow-hidden group ${className}`}>
       <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${current * 100}%)` }}>
         {banners.map((b, i) => (
-          <div key={i} className="w-full shrink-0 aspect-[16/9]">
+          <div key={i} className="w-full shrink-0 aspect-[16/9] md:max-h-[400px] lg:max-h-[450px]">
             <img src={b.image} alt={b.alt} className="w-full h-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} />
           </div>
         ))}
