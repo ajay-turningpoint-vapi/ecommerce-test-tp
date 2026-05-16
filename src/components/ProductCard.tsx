@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus, ChevronDown } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import type { Product } from '@/types';
 
