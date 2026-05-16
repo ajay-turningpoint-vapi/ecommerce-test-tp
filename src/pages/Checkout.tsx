@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, X, ChevronDown, ChevronUp, Truck, CreditCard, Smartphone, Banknote, Building } from 'lucide-react';
+import { toast } from 'sonner';
 import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
