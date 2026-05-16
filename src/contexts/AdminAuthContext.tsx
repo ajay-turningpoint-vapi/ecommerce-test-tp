@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+const ADMIN_CREDENTIALS = {
+  email: 'admin@superbeauty.com',
+  password: 'admin123',
+  user: { id: '1', name: 'Super Admin', email: 'admin@superbeauty.com', role: 'admin' },
+};
 
 interface AdminUser {
   id: string;
@@ -23,37 +28,20 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token));
-        if (payload.exp > Date.now()) {
-          setAdminUser({ id: payload.sub, name: payload.name, email: payload.email, role: payload.role });
-        } else {
-          localStorage.removeItem('adminToken');
-        }
-      } catch {
-        localStorage.removeItem('adminToken');
-      }
+    const saved = localStorage.getItem('adminUser');
+    if (saved) {
+      try { setAdminUser(JSON.parse(saved)); } catch { localStorage.removeItem('adminUser'); }
     }
     setLoading(false);
   }, []);
 
   const adminLogin = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase.rpc('admin_login', {
-        p_email: email,
-        p_password: password,
-      });
-      if (error) return false;
-      const result = data as Record<string, any> | null;
-      if (!result || result.error || !result.token) return false;
-      localStorage.setItem('adminToken', result.token);
-      setAdminUser(result.admin);
+    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+      setAdminUser(ADMIN_CREDENTIALS.user);
+      localStorage.setItem('adminUser', JSON.stringify(ADMIN_CREDENTIALS.user));
       return true;
-    } catch {
-      return false;
     }
+    return false;
   };
 
   const adminLogout = () => {
