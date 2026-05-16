@@ -148,6 +148,11 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
   const [discount, setDiscount] = useState(initial?.discount || 0);
   const [weight, setWeight] = useState(initial?.weight || '');
   const [deliveryTime, setDeliveryTime] = useState(initial?.deliveryTime || '2-3 days');
+  const [tagsStr, setTagsStr] = useState((initial?.tags || []).join(', '));
+  const [ingredients, setIngredients] = useState(initial?.ingredients || '');
+  const [howToUse, setHowToUse] = useState(initial?.howToUse || '');
+  const [pieces, setPieces] = useState(initial?.pieces || '');
+  const [serves, setServes] = useState(initial?.serves || '');
 
   const autoSlug = (val: string) => val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const parentCats = store.categories.filter(c => c.level === 0);
@@ -157,7 +162,8 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
     <form onSubmit={e => {
       e.preventDefault();
       if (!title || !categoryId || !brandId) { toast.error('Title, category and brand are required'); return; }
-      onSave({ title, slug: slug || autoSlug(title), categoryId, brandId, shortDescription: shortDesc, fullDescription: fullDesc, status, discount, weight, deliveryTime });
+      const tags = tagsStr.split(',').map(t => t.trim()).filter(Boolean);
+      onSave({ title, slug: slug || autoSlug(title), categoryId, brandId, shortDescription: shortDesc, fullDescription: fullDesc, status, discount, weight, deliveryTime, tags, ingredients, howToUse, pieces, serves });
     }} className="space-y-4">
       <div>
         <label className="block text-sm font-medium mb-1.5">Product Title *</label>
@@ -203,6 +209,33 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
         <textarea value={fullDesc} onChange={e => setFullDesc(e.target.value)} placeholder="Detailed product description..." rows={3}
           className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors resize-none" />
       </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Tags <span className="text-muted-foreground font-normal">(comma separated)</span></label>
+        <input value={tagsStr} onChange={e => setTagsStr(e.target.value)} placeholder="e.g. Lipstick, Matte, Long-lasting"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Key Ingredients</label>
+        <textarea value={ingredients} onChange={e => setIngredients(e.target.value)} placeholder="e.g. Vitamin C 15%, Hyaluronic Acid, Niacinamide" rows={2}
+          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors resize-none" />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">How to Use</label>
+        <textarea value={howToUse} onChange={e => setHowToUse(e.target.value)} placeholder="Usage instructions for the customer" rows={2}
+          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors resize-none" />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium mb-1.5">Pieces</label>
+          <input value={pieces} onChange={e => setPieces(e.target.value)} placeholder="e.g. 12 shades"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5">Serves</label>
+          <input value={serves} onChange={e => setServes(e.target.value)} placeholder="e.g. 60 days"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
+        </div>
+      </div>
       <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-sm font-medium mb-1.5">Discount %</label>
@@ -223,6 +256,11 @@ const ProductForm = ({ initial, onSave }: { initial: AdminProduct | null; onSave
             <option value="inactive">Inactive</option>
           </select>
         </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1.5">Delivery Time</label>
+        <input value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} placeholder="e.g. 2-3 days"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-colors" />
       </div>
       <button type="submit"
         className="w-full rounded-lg bg-primary py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors mt-2">
