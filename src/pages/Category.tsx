@@ -13,7 +13,7 @@ import sale50 from '@/assets/banners/sale-50-off.jpg';
 import glowUp from '@/assets/banners/glow-up-sale.jpg';
 import hairCare from '@/assets/banners/hair-care-week.jpg';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Loader2, SlidersHorizontal, X, Check } from 'lucide-react';
+import { Loader2, SlidersHorizontal, X, Check, ArrowUpDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const ITEMS_PER_PAGE = 8;
