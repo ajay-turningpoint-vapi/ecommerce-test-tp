@@ -20,6 +20,11 @@ const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
         <img
           src={images[selected]}
           alt={`${name} - ${selected + 1}`}
+          width={800}
+          height={800}
+          decoding="async"
+          fetchPriority="high"
+          sizes="(min-width: 768px) 50vw, 100vw"
           className="w-full aspect-square object-cover"
         />
         {images.length > 1 && (
@@ -53,7 +58,7 @@ const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
                   : 'border-border hover:border-primary/50'
               }`}
             >
-              <img src={img} alt={`${name} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+              <img src={img} alt={`${name} thumbnail ${i + 1}`} loading="lazy" decoding="async" width={80} height={80} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

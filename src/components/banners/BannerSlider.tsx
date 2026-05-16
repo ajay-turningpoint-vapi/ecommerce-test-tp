@@ -34,7 +34,7 @@ const BannerSlider = ({ banners, autoPlay = true, interval = 3500, className = '
                 <source media="(max-width: 767px)" srcSet={b.mobileImage} />
               )}
               <source media="(min-width: 768px)" srcSet={b.image} />
-              <img src={b.image} alt={b.alt} className="w-full h-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} />
+              <img src={b.image} alt={b.alt} className="w-full h-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} decoding={i === 0 ? 'sync' : 'async'} fetchPriority={i === 0 ? 'high' : 'low'} sizes="100vw" width={1600} height={600} />
             </picture>
           </div>
         ))}

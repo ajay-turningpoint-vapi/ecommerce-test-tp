@@ -65,7 +65,7 @@ const Index = () => {
             {categories.map(cat => (
               <Link key={cat.id} to={`/category/${cat.slug}`} className="flex flex-col items-center gap-2 group w-20">
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-colors">
-                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" loading="lazy" />
+                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" loading="lazy" decoding="async" width={80} height={80} sizes="80px" />
                 </div>
                 <span className="text-xs font-medium text-center line-clamp-2">{cat.name}</span>
               </Link>

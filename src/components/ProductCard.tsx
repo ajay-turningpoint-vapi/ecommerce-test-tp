@@ -23,6 +23,10 @@ const ProductCard = ({ product }: Props) => {
           src={product.image}
           alt={product.name}
           loading="lazy"
+          decoding="async"
+          width={400}
+          height={400}
+          sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
           className={`w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300 ${isOut ? 'grayscale opacity-70' : ''}`}
         />
         {isOut && (

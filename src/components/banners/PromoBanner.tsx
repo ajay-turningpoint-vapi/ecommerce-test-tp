@@ -17,7 +17,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
     return (
       <Link to={link} className={`block rounded-2xl overflow-hidden relative group ${className}`}>
         <div className="aspect-[16/9] md:aspect-[21/7] md:max-h-[280px] lg:max-h-[320px] xl:max-h-[360px]">
-          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
+          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" decoding="async" sizes="100vw" width={1600} height={600} />
         </div>
       </Link>
     );
@@ -39,7 +39,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
     return (
       <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
         <div className="aspect-[16/9] md:aspect-[21/7] md:max-h-[280px] lg:max-h-[320px] xl:max-h-[360px]">
-          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
+          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" decoding="async" sizes="100vw" width={1600} height={600} />
         </div>
       </Link>
     );
@@ -50,7 +50,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
     <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
       {image ? (
         <div className="w-full">
-          <img src={image} alt={title} className="w-full h-full object-cover rounded-2xl" loading="lazy" />
+          <img src={image} alt={title} className="w-full h-full object-cover rounded-2xl" loading="lazy" decoding="async" sizes="(min-width: 768px) 50vw, 100vw" width={800} height={400} />
         </div>
       ) : (
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
