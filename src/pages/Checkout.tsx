@@ -9,6 +9,21 @@ import type { Address, Order } from '@/types';
 
 const steps = ['Sign Up', 'Address', 'Payment'];
 
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat',
+  'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh',
+  'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Chandigarh', 'Puducherry',
+];
+
+interface AddressFormData {
+  name: string; phone: string; house: string; road: string; landmark: string;
+  city: string; state: string; pincode: string;
+}
+
+const emptyAddress: AddressFormData = { name: '', phone: '', house: '', road: '', landmark: '', city: '', state: '', pincode: '' };
+
 const Checkout = () => {
   const { items, totalItems, totalPrice, totalSavings, clearCart } = useCart();
   const { user } = useAuth();
@@ -16,12 +31,20 @@ const Checkout = () => {
   const [step, setStep] = useState(user ? 1 : 0);
   const [showBag, setShowBag] = useState(false);
 
+  // Load saved addresses from localStorage
+  const savedAddresses: Address[] = JSON.parse(localStorage.getItem('addresses') || '[]');
+
   // Address form
-  const [address, setAddress] = useState<Partial<Address>>({
-    pincode: '', house: '', road: '', landmark: '', city: '', state: '', name: user?.name || '', phone: user?.phone || '', email: user?.email || '', isDefault: true,
+  const [addrForm, setAddrForm] = useState<AddressFormData>({
+    ...emptyAddress,
+    name: user?.name || '',
+    phone: user?.phone || '',
   });
+  const [addrErrors, setAddrErrors] = useState<Partial<AddressFormData>>({});
   const [showAddressForm, setShowAddressForm] = useState(false);
-  const [savedAddress, setSavedAddress] = useState<Address | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(
+    savedAddresses.find(a => a.isDefault) || savedAddresses[0] || null
+  );
 
   // Payment
   const [paymentMethod, setPaymentMethod] = useState('upi');
@@ -32,22 +55,36 @@ const Checkout = () => {
     return null;
   }
 
+  const validateAddress = (): boolean => {
+    const errors: Partial<AddressFormData> = {};
+    if (!addrForm.name.trim()) errors.name = 'Name is required';
+    if (!addrForm.phone.trim() || !/^[6-9]\d{9}$/.test(addrForm.phone.trim())) errors.phone = 'Valid 10-digit phone required';
+    if (!addrForm.house.trim()) errors.house = 'House/Flat number is required';
+    if (!addrForm.road.trim()) errors.road = 'Road/Area is required';
+    if (!addrForm.city.trim()) errors.city = 'City is required';
+    if (!addrForm.state) errors.state = 'State is required';
+    if (!addrForm.pincode.trim() || !/^\d{6}$/.test(addrForm.pincode.trim())) errors.pincode = 'Valid 6-digit pincode required';
+    setAddrErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSaveAddress = () => {
+    if (!validateAddress()) return;
     const addr: Address = {
       id: Date.now().toString(),
-      pincode: address.pincode || '',
-      house: address.house || '',
-      road: address.road || '',
-      landmark: address.landmark || '',
-      city: address.city || '',
-      state: address.state || '',
-      name: address.name || '',
-      phone: address.phone || '',
-      email: address.email || '',
-      isDefault: true,
+      ...addrForm,
+      email: user?.email || '',
+      isDefault: savedAddresses.length === 0,
     };
-    setSavedAddress(addr);
+    const allAddresses = [...savedAddresses, addr];
+    localStorage.setItem('addresses', JSON.stringify(allAddresses));
+    setSelectedAddress(addr);
     setShowAddressForm(false);
+    setStep(2);
+  };
+
+  const handleSelectAddress = (addr: Address) => {
+    setSelectedAddress(addr);
     setStep(2);
   };
 
@@ -56,7 +93,7 @@ const Checkout = () => {
       id: Date.now().toString(),
       orderNumber: Math.floor(100000 + Math.random() * 900000).toString(),
       items: [...items],
-      address: savedAddress!,
+      address: selectedAddress!,
       paymentMethod,
       subtotal: totalPrice,
       delivery: 0,
@@ -78,10 +115,9 @@ const Checkout = () => {
       saveOrderAndRedirect('COD');
       return;
     }
-
     const options = {
       key: 'rzp_test_SP6LMvYbb7pF1E',
-      amount: totalPrice * 100, // Razorpay expects paise
+      amount: totalPrice * 100,
       currency: 'INR',
       name: 'Super Beauty',
       description: `Order of ${totalItems} item(s)`,
@@ -90,16 +126,13 @@ const Checkout = () => {
         saveOrderAndRedirect(response.razorpay_payment_id);
       },
       prefill: {
-        name: savedAddress?.name || user?.name || '',
-        email: savedAddress?.email || user?.email || '',
-        contact: savedAddress?.phone || user?.phone || '',
+        name: selectedAddress?.name || user?.name || '',
+        email: selectedAddress?.email || user?.email || '',
+        contact: selectedAddress?.phone || user?.phone || '',
       },
       theme: { color: '#e91e63' },
-      modal: {
-        ondismiss: () => toast.error('Payment cancelled'),
-      },
+      modal: { ondismiss: () => toast.error('Payment cancelled') },
     };
-
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
   };
@@ -110,6 +143,8 @@ const Checkout = () => {
     { id: 'cod', label: 'Cash on Delivery', desc: 'Pay at your doorstep', icon: Banknote },
     { id: 'netbanking', label: 'NetBanking', desc: 'Pay through your favourite bank', icon: Building },
   ];
+
+  const inputClass = (err?: string) => `w-full mt-1 rounded-lg border ${err ? 'border-destructive' : 'border-border'} px-3 py-2 text-sm bg-background`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,14 +171,12 @@ const Checkout = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {/* Main content */}
           <div className="md:col-span-2">
-            {/* Step 0: Login redirect */}
+            {/* Step 0: Login */}
             {step === 0 && (
               <div className="rounded-lg border border-border p-6">
                 <h2 className="text-lg font-bold">Please login to continue</h2>
-                <button
-                  onClick={() => navigate('/login?redirect=/checkout')}
-                  className="mt-4 rounded-lg bg-primary px-6 py-2 text-sm font-bold text-primary-foreground"
-                >
+                <button onClick={() => navigate('/login?redirect=/checkout')}
+                  className="mt-4 rounded-lg bg-primary px-6 py-2 text-sm font-bold text-primary-foreground">
                   Login / Sign Up
                 </button>
               </div>
@@ -155,22 +188,51 @@ const Checkout = () => {
                 <h2 className="text-xl font-bold">Choose Address</h2>
                 <p className="text-sm text-muted-foreground">Detailed address will help our delivery partner reach your doorstep quickly</p>
 
-                {savedAddress && !showAddressForm ? (
-                  <div className="mt-4 rounded-lg border border-border p-4">
-                    <p className="font-medium">{savedAddress.house}, {savedAddress.road}, {savedAddress.pincode}</p>
-                    <button onClick={() => setStep(2)} className="mt-3 rounded-lg bg-primary px-6 py-2 text-sm font-bold text-primary-foreground">
-                      Continue
-                    </button>
+                {/* Saved addresses */}
+                {savedAddresses.length > 0 && !showAddressForm && (
+                  <div className="space-y-3 mt-4">
+                    {savedAddresses.map(addr => (
+                      <div key={addr.id} className={`rounded-lg border p-4 cursor-pointer transition-colors ${
+                        selectedAddress?.id === addr.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+                      }`} onClick={() => setSelectedAddress(addr)}>
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-medium text-sm">{addr.name} <span className="text-muted-foreground">• {addr.phone}</span></p>
+                            <p className="text-sm text-muted-foreground mt-1">{addr.house}, {addr.road}{addr.landmark ? `, ${addr.landmark}` : ''}</p>
+                            <p className="text-sm text-muted-foreground">{addr.city}, {addr.state} - {addr.pincode}</p>
+                            {addr.isDefault && <span className="inline-block mt-1 text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">Default</span>}
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            selectedAddress?.id === addr.id ? 'border-primary' : 'border-muted-foreground/30'
+                          }`}>
+                            {selectedAddress?.id === addr.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex gap-3 mt-2">
+                      <button onClick={() => handleSelectAddress(selectedAddress!)}
+                        disabled={!selectedAddress}
+                        className="rounded-lg bg-primary px-6 py-2 text-sm font-bold text-primary-foreground disabled:opacity-50">
+                        Deliver Here
+                      </button>
+                      <button onClick={() => { setShowAddressForm(true); setAddrErrors({}); setAddrForm({ ...emptyAddress, name: user?.name || '', phone: user?.phone || '' }); }}
+                        className="rounded-lg border border-border px-6 py-2 text-sm font-medium text-primary hover:bg-accent">
+                        + Add New Address
+                      </button>
+                    </div>
                   </div>
-                ) : !showAddressForm ? (
-                  <button
-                    onClick={() => setShowAddressForm(true)}
-                    className="mt-4 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-6 md:p-8 w-full md:w-72 text-primary font-medium text-sm"
-                  >
+                )}
+
+                {/* No saved addresses */}
+                {savedAddresses.length === 0 && !showAddressForm && (
+                  <button onClick={() => setShowAddressForm(true)}
+                    className="mt-4 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-6 md:p-8 w-full md:w-72 text-primary font-medium text-sm">
                     <span className="text-2xl">+</span> Add New Address
                   </button>
-                ) : null}
+                )}
 
+                {/* Address Form - same as Profile */}
                 {showAddressForm && (
                   <div className="mt-4 rounded-lg border border-border p-4 md:p-6 max-w-lg">
                     <div className="flex justify-between items-center mb-4">
@@ -178,47 +240,59 @@ const Checkout = () => {
                       <button onClick={() => setShowAddressForm(false)}><X className="h-5 w-5" /></button>
                     </div>
                     <div className="space-y-3">
-                      <div>
-                        <label className="text-sm font-medium">Address</label>
-                        <input placeholder="Pincode" value={address.pincode} onChange={e => setAddress({ ...address, pincode: e.target.value })}
-                          className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm" />
-                      </div>
-                      <input placeholder="House/ Flat/ Office No." value={address.house} onChange={e => setAddress({ ...address, house: e.target.value })}
-                        className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
-                      <textarea placeholder="Road Name/ Area / Colony" value={address.road} onChange={e => setAddress({ ...address, road: e.target.value })}
-                        className="w-full rounded-lg border border-border px-3 py-2 text-sm" rows={2} />
-                      <input placeholder="Landmark (Optional)" value={address.landmark || ''} onChange={e => setAddress({ ...address, landmark: e.target.value })}
-                        className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
                       <div className="grid grid-cols-2 gap-3">
-                        <input placeholder="City" value={address.city || ''} onChange={e => setAddress({ ...address, city: e.target.value })}
-                          className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
-                        <input placeholder="State" value={address.state || ''} onChange={e => setAddress({ ...address, state: e.target.value })}
-                          className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Use as default address</span>
-                        <div className="w-10 h-5 rounded-full bg-primary relative cursor-pointer">
-                          <div className="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-primary-foreground" />
+                        <div>
+                          <label className="text-xs font-medium">Full Name *</label>
+                          <input value={addrForm.name} onChange={e => setAddrForm({ ...addrForm, name: e.target.value })}
+                            className={inputClass(addrErrors.name)} placeholder="Full Name" />
+                          {addrErrors.name && <p className="text-xs text-destructive mt-0.5">{addrErrors.name}</p>}
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium">Phone *</label>
+                          <input value={addrForm.phone} onChange={e => setAddrForm({ ...addrForm, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                            className={inputClass(addrErrors.phone)} placeholder="10-digit phone" />
+                          {addrErrors.phone && <p className="text-xs text-destructive mt-0.5">{addrErrors.phone}</p>}
                         </div>
                       </div>
-                      <div className="pt-2">
-                        <h4 className="text-sm font-bold">Contact</h4>
-                        <p className="text-xs text-muted-foreground">Information provided here will be used to contact you for delivery updates</p>
+                      <div>
+                        <label className="text-xs font-medium">House / Flat / Office No. *</label>
+                        <input value={addrForm.house} onChange={e => setAddrForm({ ...addrForm, house: e.target.value })}
+                          className={inputClass(addrErrors.house)} placeholder="House / Flat / Office No." />
+                        {addrErrors.house && <p className="text-xs text-destructive mt-0.5">{addrErrors.house}</p>}
                       </div>
                       <div>
-                        <label className="text-xs font-medium">Name</label>
-                        <input value={address.name} onChange={e => setAddress({ ...address, name: e.target.value })}
-                          className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+                        <label className="text-xs font-medium">Road / Area / Colony *</label>
+                        <textarea value={addrForm.road} onChange={e => setAddrForm({ ...addrForm, road: e.target.value })}
+                          className={inputClass(addrErrors.road)} rows={2} placeholder="Road / Area / Colony" />
+                        {addrErrors.road && <p className="text-xs text-destructive mt-0.5">{addrErrors.road}</p>}
                       </div>
                       <div>
-                        <label className="text-xs font-medium">Phone</label>
-                        <input placeholder="Phone" value={address.phone} onChange={e => setAddress({ ...address, phone: e.target.value })}
-                          className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+                        <label className="text-xs font-medium">Landmark (Optional)</label>
+                        <input value={addrForm.landmark} onChange={e => setAddrForm({ ...addrForm, landmark: e.target.value })}
+                          className={inputClass()} placeholder="Near School, Temple etc." />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium">City *</label>
+                          <input value={addrForm.city} onChange={e => setAddrForm({ ...addrForm, city: e.target.value })}
+                            className={inputClass(addrErrors.city)} placeholder="City" />
+                          {addrErrors.city && <p className="text-xs text-destructive mt-0.5">{addrErrors.city}</p>}
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium">Pincode *</label>
+                          <input value={addrForm.pincode} onChange={e => setAddrForm({ ...addrForm, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                            className={inputClass(addrErrors.pincode)} placeholder="6-digit pincode" />
+                          {addrErrors.pincode && <p className="text-xs text-destructive mt-0.5">{addrErrors.pincode}</p>}
+                        </div>
                       </div>
                       <div>
-                        <label className="text-xs font-medium">Email ID (Optional)</label>
-                        <input value={address.email} onChange={e => setAddress({ ...address, email: e.target.value })}
-                          className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+                        <label className="text-xs font-medium">State *</label>
+                        <select value={addrForm.state} onChange={e => setAddrForm({ ...addrForm, state: e.target.value })}
+                          className={inputClass(addrErrors.state)}>
+                          <option value="">Select State</option>
+                          {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                        {addrErrors.state && <p className="text-xs text-destructive mt-0.5">{addrErrors.state}</p>}
                       </div>
                       <button onClick={handleSaveAddress}
                         className="w-full rounded-lg bg-primary py-3 text-sm font-bold uppercase text-primary-foreground">
@@ -240,13 +314,10 @@ const Checkout = () => {
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold mb-2">Payment Method Options</h3>
                     {paymentMethods.map(pm => (
-                      <button
-                        key={pm.id}
-                        onClick={() => setPaymentMethod(pm.id)}
+                      <button key={pm.id} onClick={() => setPaymentMethod(pm.id)}
                         className={`w-full flex items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors ${
                           paymentMethod === pm.id ? 'border-primary bg-primary/5' : 'border-border'
-                        }`}
-                      >
+                        }`}>
                         <pm.icon className="h-5 w-5 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium">{pm.label}</p>
@@ -271,10 +342,8 @@ const Checkout = () => {
                     {paymentMethod === 'cod' && <h3 className="font-bold">Cash on Delivery</h3>}
                     {paymentMethod === 'netbanking' && <h3 className="font-bold">Select Bank</h3>}
 
-                    <button
-                      onClick={handlePlaceOrder}
-                      className="mt-4 md:mt-6 w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground"
-                    >
+                    <button onClick={handlePlaceOrder}
+                      className="mt-4 md:mt-6 w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground">
                       Pay ₹{totalPrice}
                     </button>
                   </div>
@@ -334,13 +403,15 @@ const Checkout = () => {
               )}
             </div>
 
-            {savedAddress && (
+            {selectedAddress && (
               <div className="rounded-lg border border-border p-4">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-sm">Deliver to</span>
                   <button onClick={() => setStep(1)} className="text-sm text-primary font-medium">Change</button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">{savedAddress.house}, {savedAddress.road}, {savedAddress.pincode}</p>
+                <p className="text-sm font-medium mt-1">{selectedAddress.name}</p>
+                <p className="text-xs text-muted-foreground">{selectedAddress.house}, {selectedAddress.road}</p>
+                <p className="text-xs text-muted-foreground">{selectedAddress.city}, {selectedAddress.state} - {selectedAddress.pincode}</p>
               </div>
             )}
 
