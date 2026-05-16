@@ -238,7 +238,31 @@ const Category = () => {
                 )}
               </SheetHeader>
               <div className="mt-4 space-y-5 overflow-y-auto max-h-[55vh] pb-4">
-                {availableAttributes.length === 0 && (
+                {/* Sort options */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-2 flex items-center gap-1.5"><ArrowUpDown className="h-3.5 w-3.5" /> Sort by Price</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {([['none', 'Default'], ['low-high', 'Low to High'], ['high-low', 'High to Low']] as const).map(([val, label]) => {
+                      const isActive = sortOrder === val;
+                      return (
+                        <button
+                          key={val}
+                          onClick={() => { setSortOrder(val); setVisibleCount(ITEMS_PER_PAGE); }}
+                          className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium border transition-colors ${
+                            isActive
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border hover:bg-muted'
+                          }`}
+                        >
+                          {isActive && <Check className="h-3 w-3" />}
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {availableAttributes.length === 0 && sortOrder === 'none' && (
                   <p className="text-sm text-muted-foreground text-center py-6">No filters available for this category</p>
                 )}
                 {availableAttributes.map(attr => (
