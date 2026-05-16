@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import AdminPagination from '@/components/admin/AdminPagination';
-import { Eye, X, Search } from 'lucide-react';
-import { getOrders } from '@/data/adminSharedData';
+import { Search, Eye, X, Pencil, Trash2 } from 'lucide-react';
+import { getOrders, updateItem, deleteItem } from '@/data/adminSharedData';
+import { useAdminStore } from '@/hooks/useAdminStore';
 import { toast } from 'sonner';
 
 const statusColors: Record<string, string> = {
@@ -17,10 +18,13 @@ const statusColors: Record<string, string> = {
 const allStatuses = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested'];
 
 const OrderManagement = () => {
-  const orders = useMemo(() => getOrders(), []);
+  useAdminStore();
+  const orders = getOrders();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState('');
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
@@ -36,9 +40,20 @@ const OrderManagement = () => {
 
   const detail = selectedId ? orders.find(o => o.id === selectedId) : null;
 
+  const handleStatusChange = (id: string) => {
+    updateItem(orders, id, { status: editStatus });
+    toast.success('Order status updated');
+    setEditId(null);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteItem(orders, id);
+    toast.success('Order deleted');
+  };
+
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Order Management</h2>
+      <h2 className="text-2xl font-bold">Order Management ({orders.length})</h2>
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -75,10 +90,24 @@ const OrderManagement = () => {
                 <td className="px-4 py-3 font-medium">₹{o.total}</td>
                 <td className="px-4 py-3">{o.paymentMethod}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[o.status] || 'bg-muted'}`}>{o.status}</span>
+                  {editId === o.id ? (
+                    <div className="flex gap-1 items-center">
+                      <select value={editStatus} onChange={e => setEditStatus(e.target.value)} className="rounded border border-border bg-background px-1 py-0.5 text-xs">
+                        {allStatuses.map(s => <option key={s}>{s}</option>)}
+                      </select>
+                      <button onClick={() => handleStatusChange(o.id)} className="text-xs text-primary font-medium">Save</button>
+                      <button onClick={() => setEditId(null)} className="text-xs text-muted-foreground">✕</button>
+                    </div>
+                  ) : (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[o.status] || 'bg-muted'}`}>{o.status}</span>
+                  )}
                 </td>
                 <td className="px-4 py-3">
-                  <button onClick={() => setSelectedId(o.id)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
+                  <div className="flex gap-1">
+                    <button onClick={() => setSelectedId(o.id)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
+                    <button onClick={() => { setEditId(o.id); setEditStatus(o.status); }} className="p-1.5 rounded hover:bg-muted transition-colors"><Pencil className="h-4 w-4" /></button>
+                    <button onClick={() => handleDelete(o.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive transition-colors"><Trash2 className="h-4 w-4" /></button>
+                  </div>
                 </td>
               </tr>
             ));})()}

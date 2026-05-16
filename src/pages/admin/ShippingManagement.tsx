@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import AdminPagination from '@/components/admin/AdminPagination';
-import { Search, MapPin } from 'lucide-react';
-import { getShipments } from '@/data/adminSharedData';
+import { Search, MapPin, Pencil, Trash2, X } from 'lucide-react';
+import { getShipments, updateItem, deleteItem } from '@/data/adminSharedData';
+import { useAdminStore } from '@/hooks/useAdminStore';
 import { toast } from 'sonner';
 
 const statusColors: Record<string, string> = {
@@ -10,9 +11,14 @@ const statusColors: Record<string, string> = {
   'Return Pickup Pending': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
 };
 
+const allStatuses = ['In Transit', 'Delivered', 'Return Pickup Pending'];
+
 const ShippingManagement = () => {
-  const shipments = useMemo(() => getShipments(), []);
+  useAdminStore();
+  const shipments = getShipments();
   const [search, setSearch] = useState('');
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState('');
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
@@ -20,6 +26,17 @@ const ShippingManagement = () => {
     shipments.filter(s => s.orderNumber.toLowerCase().includes(search.toLowerCase()) || s.trackingNumber.toLowerCase().includes(search.toLowerCase())),
     [shipments, search]
   );
+
+  const handleStatusChange = (id: string) => {
+    updateItem(shipments, id, { status: editStatus });
+    toast.success('Shipment status updated');
+    setEditId(null);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteItem(shipments, id);
+    toast.success('Shipment deleted');
+  };
 
   return (
     <div className="space-y-4">
@@ -47,9 +64,25 @@ const ShippingManagement = () => {
                 <td className="px-4 py-3 font-medium">{s.orderNumber}</td>
                 <td className="px-4 py-3">{s.carrier}</td>
                 <td className="px-4 py-3 font-mono text-xs">{s.trackingNumber}</td>
-                <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[s.status] || 'bg-muted'}`}>{s.status}</span></td>
                 <td className="px-4 py-3">
-                  <button onClick={() => toast.info(`Tracking: ${s.trackingNumber}`)} className="p-1.5 rounded hover:bg-muted transition-colors"><MapPin className="h-4 w-4" /></button>
+                  {editId === s.id ? (
+                    <div className="flex gap-1 items-center">
+                      <select value={editStatus} onChange={e => setEditStatus(e.target.value)} className="rounded border border-border bg-background px-1 py-0.5 text-xs">
+                        {allStatuses.map(st => <option key={st}>{st}</option>)}
+                      </select>
+                      <button onClick={() => handleStatusChange(s.id)} className="text-xs text-primary font-medium">Save</button>
+                      <button onClick={() => setEditId(null)} className="text-xs text-muted-foreground">✕</button>
+                    </div>
+                  ) : (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[s.status] || 'bg-muted'}`}>{s.status}</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex gap-1">
+                    <button onClick={() => toast.info(`Tracking: ${s.trackingNumber}`)} className="p-1.5 rounded hover:bg-muted transition-colors"><MapPin className="h-4 w-4" /></button>
+                    <button onClick={() => { setEditId(s.id); setEditStatus(s.status); }} className="p-1.5 rounded hover:bg-muted transition-colors"><Pencil className="h-4 w-4" /></button>
+                    <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive transition-colors"><Trash2 className="h-4 w-4" /></button>
+                  </div>
                 </td>
               </tr>
             ));})()}

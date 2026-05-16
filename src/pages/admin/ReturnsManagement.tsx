@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
 import AdminPagination from '@/components/admin/AdminPagination';
-import { Eye, X } from 'lucide-react';
-import { getReturns } from '@/data/adminSharedData';
+import { Eye, X, Pencil, Trash2 } from 'lucide-react';
+import { getReturns, updateItem, deleteItem } from '@/data/adminSharedData';
+import { useAdminStore } from '@/hooks/useAdminStore';
+import { toast } from 'sonner';
 
 const statusColors: Record<string, string> = {
   Pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -10,11 +12,27 @@ const statusColors: Record<string, string> = {
   Refunded: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
 };
 
+const allStatuses = ['Pending', 'Approved', 'Rejected', 'Refunded'];
+
 const ReturnsManagement = () => {
-  const returns = useMemo(() => getReturns(), []);
+  useAdminStore();
+  const returns = getReturns();
   const [selected, setSelected] = useState<any>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editStatus, setEditStatus] = useState('');
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
+
+  const handleStatusChange = (id: string) => {
+    updateItem(returns, id, { status: editStatus });
+    toast.success('Return status updated');
+    setEditId(null);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteItem(returns, id);
+    toast.success('Return request deleted');
+  };
 
   return (
     <div className="space-y-4">
@@ -39,9 +57,25 @@ const ReturnsManagement = () => {
                 <td className="px-4 py-3 max-w-[150px] truncate">{r.productName}</td>
                 <td className="px-4 py-3">{r.reason}</td>
                 <td className="px-4 py-3">₹{r.refundAmount}</td>
-                <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[r.status] || 'bg-muted'}`}>{r.status}</span></td>
                 <td className="px-4 py-3">
-                  <button onClick={() => setSelected(r)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
+                  {editId === r.id ? (
+                    <div className="flex gap-1 items-center">
+                      <select value={editStatus} onChange={e => setEditStatus(e.target.value)} className="rounded border border-border bg-background px-1 py-0.5 text-xs">
+                        {allStatuses.map(s => <option key={s}>{s}</option>)}
+                      </select>
+                      <button onClick={() => handleStatusChange(r.id)} className="text-xs text-primary font-medium">Save</button>
+                      <button onClick={() => setEditId(null)} className="text-xs text-muted-foreground">✕</button>
+                    </div>
+                  ) : (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[r.status] || 'bg-muted'}`}>{r.status}</span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex gap-1">
+                    <button onClick={() => setSelected(r)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
+                    <button onClick={() => { setEditId(r.id); setEditStatus(r.status); }} className="p-1.5 rounded hover:bg-muted transition-colors"><Pencil className="h-4 w-4" /></button>
+                    <button onClick={() => handleDelete(r.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive transition-colors"><Trash2 className="h-4 w-4" /></button>
+                  </div>
                 </td>
               </tr>
             ));})()}
