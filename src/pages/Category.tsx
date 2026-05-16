@@ -97,8 +97,12 @@ const Category = () => {
   const sortedProducts = useMemo(() => {
     if (sortOrder === 'none') return filteredProducts;
     return [...filteredProducts].sort((a, b) => {
-      const priceA = a.discountPrice ?? a.price;
-      const priceB = b.discountPrice ?? b.price;
+      const getMinPrice = (p: typeof a) => {
+        const prices = p.variants.map(v => v.price);
+        return prices.length > 0 ? Math.min(...prices) : 0;
+      };
+      const priceA = getMinPrice(a);
+      const priceB = getMinPrice(b);
       return sortOrder === 'low-high' ? priceA - priceB : priceB - priceA;
     });
   }, [filteredProducts, sortOrder]);
