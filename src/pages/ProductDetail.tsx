@@ -146,8 +146,24 @@ const ProductDetail = () => {
           <ProductDetailSkeleton />
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Image gallery with thumbnails */}
-            <ProductImageGallery images={product.images?.length ? product.images : [product.image]} name={product.name} />
+            {(() => {
+              const baseImages = product.images?.length ? product.images : [product.image];
+              const sameCat = products.filter(p => p.categoryId === product.categoryId && p.id !== product.id).map(p => p.image);
+              const extras: string[] = [];
+              for (const img of sameCat) {
+                if (extras.length >= Math.max(0, product.variants.length + 2 - baseImages.length)) break;
+                if (!baseImages.includes(img) && !extras.includes(img)) extras.push(img);
+              }
+              const gallery = [...baseImages, ...extras];
+              const variantImageIndex = gallery.length > 1 ? selectedVariant % gallery.length : 0;
+              return (
+                <ProductImageGallery
+                  images={gallery}
+                  name={product.name}
+                  activeIndex={variantImageIndex}
+                />
+              );
+            })()}
 
             <div>
               <div className="flex items-start justify-between gap-3">
