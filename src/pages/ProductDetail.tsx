@@ -8,7 +8,8 @@ import PromoBanner from '@/components/banners/PromoBanner';
 import DualBanner from '@/components/banners/DualBanner';
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import ProductDetailSkeleton from '@/components/skeletons/ProductDetailSkeleton';
-import { products, categories } from '@/data/products';
+import { useDbProducts, useDbProduct } from '@/hooks/useDbProducts';
+import { useDbCategories } from '@/hooks/useDbCategories';
 import { useCart } from '@/contexts/CartContext';
 import freeShipping from '@/assets/banners/free-shipping.jpg';
 import glowUp from '@/assets/banners/glow-up-sale.jpg';
@@ -16,18 +17,18 @@ import newArrivals from '@/assets/banners/new-arrivals.jpg';
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const product = products.find(p => p.slug === slug);
+  const { data: product, isLoading: productLoading } = useDbProduct(slug);
+  const { data: products = [] } = useDbProducts();
+  const { data: catData } = useDbCategories();
+  const categories = catData?.categories || [];
   const { items, addItem, updateQuantity } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(0);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 400);
-    return () => clearTimeout(timer);
+    setSelectedVariant(0);
   }, [slug]);
 
-  if (!product) {
+  if (!productLoading && !product) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -39,11 +40,11 @@ const ProductDetail = () => {
     );
   }
 
-  const variant = product.variants[selectedVariant];
-  const cartItem = items.find(i => i.product.id === product.id && i.variantId === variant.id);
+  const variant = product?.variants[selectedVariant];
+  const cartItem = product && variant ? items.find(i => i.product.id === product.id && i.variantId === variant.id) : undefined;
   const qty = cartItem?.quantity || 0;
-  const category = categories.find(c => c.id === product.categoryId);
-  const related = products.filter(p => p.categoryId === product.categoryId && p.id !== product.id).slice(0, 5);
+  const category = categories.find(c => c.id === product?.categoryId);
+  const related = products.filter(p => p.categoryId === product?.categoryId && p.id !== product?.id).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background">
@@ -54,10 +55,10 @@ const ProductDetail = () => {
           {' / '}
           <Link to={`/category/${category?.slug}`} className="hover:text-primary">{category?.name}</Link>
           {' / '}
-          <span className="text-primary">{product.name}</span>
+          <span className="text-primary">{product?.name}</span>
         </div>
 
-        {loading ? (
+        {productLoading || !product || !variant ? (
           <ProductDetailSkeleton />
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
@@ -178,7 +179,7 @@ const ProductDetail = () => {
           <section className="mt-10">
             <h2 className="text-lg font-bold">You may also like</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
-              {loading
+              {productLoading
                 ? Array.from({ length: 5 }).map((_, i) => <ProductCardSkeleton key={i} />)
                 : related.map(p => <ProductCard key={p.id} product={p} />)}
             </div>

@@ -6,15 +6,19 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { adminLogin, isAdminLoggedIn } = useAdminAuth();
   const navigate = useNavigate();
 
   if (isAdminLoggedIn) { navigate('/admin', { replace: true }); return null; }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (adminLogin(email, password)) navigate('/admin');
+    setLoading(true);
+    const success = await adminLogin(email, password);
+    setLoading(false);
+    if (success) navigate('/admin');
     else setError('Invalid credentials');
   };
 
@@ -35,8 +39,8 @@ const AdminLogin = () => {
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
               className="w-full mt-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" placeholder="••••••••" />
           </div>
-          <button type="submit" className="w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground">
-            Login
+          <button type="submit" disabled={loading} className="w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground disabled:opacity-50">
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>

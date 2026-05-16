@@ -3,7 +3,7 @@ import { Search, MapPin, ShoppingCart, User, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { categories } from '@/data/products';
+import { useDbCategories } from '@/hooks/useDbCategories';
 
 const Header = () => {
   const { totalItems, totalPrice } = useCart();
@@ -12,6 +12,8 @@ const Header = () => {
   const [search, setSearch] = useState('');
   const [showCategories, setShowCategories] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { data: catData } = useDbCategories();
+  const categories = catData?.categories || [];
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

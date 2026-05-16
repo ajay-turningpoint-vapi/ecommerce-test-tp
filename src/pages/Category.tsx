@@ -7,7 +7,8 @@ import PromoBanner from '@/components/banners/PromoBanner';
 import BannerSlider from '@/components/banners/BannerSlider';
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import BannerSkeleton from '@/components/skeletons/BannerSkeleton';
-import { products, categories, subCategories } from '@/data/products';
+import { useDbProducts } from '@/hooks/useDbProducts';
+import { useDbCategories } from '@/hooks/useDbCategories';
 import sale50 from '@/assets/banners/sale-50-off.jpg';
 import glowUp from '@/assets/banners/glow-up-sale.jpg';
 import hairCare from '@/assets/banners/hair-care-week.jpg';
@@ -18,20 +19,24 @@ const ITEMS_PER_PAGE = 8;
 
 const Category = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { data: products = [], isLoading: productsLoading } = useDbProducts();
+  const { data: catData, isLoading: catsLoading } = useDbCategories();
+  const categories = catData?.categories || [];
+  const subCategories = catData?.subCategories || [];
+
   const category = categories.find(c => c.slug === slug);
   const subs = subCategories.filter(s => s.categoryId === category?.id);
   const [activeSub, setActiveSub] = useState('all');
-  const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [loadingMore, setLoadingMore] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
+  const loading = productsLoading || catsLoading;
+
   useEffect(() => {
-    setLoading(true);
     setVisibleCount(ITEMS_PER_PAGE);
-    const timer = setTimeout(() => setLoading(false), 400);
-    return () => clearTimeout(timer);
-  }, [slug, activeSub]);
+    setActiveSub('all');
+  }, [slug]);
 
   const filteredProducts = products.filter(p => {
     if (p.categoryId !== category?.id) return false;
@@ -64,7 +69,7 @@ const Category = () => {
     return () => { if (el) observer.unobserve(el); };
   }, [hasMore, loading, loadMore]);
 
-  if (!category) {
+  if (!loading && !category) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -89,12 +94,12 @@ const Category = () => {
       <Header />
       <div className="container mx-auto px-4 py-4">
         <div className="text-sm text-muted-foreground mb-2">
-          <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-primary">{category.name}</span>
+          <Link to="/" className="hover:text-primary">Home</Link> / <span className="text-primary">{category?.name || slug}</span>
         </div>
 
         {loading ? <BannerSkeleton variant="hero" className="mb-4" /> : <BannerSlider banners={categoryBanners} className="mb-4" />}
 
-        <h1 className="text-xl font-bold">{category.name}</h1>
+        <h1 className="text-xl font-bold">{category?.name}</h1>
 
         {subs.length > 0 && (
           <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
@@ -145,7 +150,6 @@ const Category = () => {
             : visibleProducts.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
 
-        {/* Infinite scroll trigger */}
         {hasMore && !loading && (
           <div ref={loaderRef} className="flex justify-center py-8">
             {loadingMore && (
@@ -167,7 +171,7 @@ const Category = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             {loading
               ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-              : products.filter(p => p.categoryId !== category.id).slice(0, 4).map(p => (
+              : products.filter(p => p.categoryId !== category?.id).slice(0, 4).map(p => (
                   <ProductCard key={p.id} product={p} />
                 ))}
           </div>

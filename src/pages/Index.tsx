@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
@@ -9,7 +9,8 @@ import DualBanner from '@/components/banners/DualBanner';
 import ProductCardSkeleton from '@/components/skeletons/ProductCardSkeleton';
 import BannerSkeleton from '@/components/skeletons/BannerSkeleton';
 import CategorySkeleton from '@/components/skeletons/CategorySkeleton';
-import { products, categories } from '@/data/products';
+import { useDbProducts } from '@/hooks/useDbProducts';
+import { useDbCategories } from '@/hooks/useDbCategories';
 import heroBanner from '@/assets/hero-banner.jpg';
 import sale50 from '@/assets/banners/sale-50-off.jpg';
 import newArrivals from '@/assets/banners/new-arrivals.jpg';
@@ -20,12 +21,11 @@ import lipFest from '@/assets/banners/lip-fest-vertical.jpg';
 import hairCare from '@/assets/banners/hair-care-week.jpg';
 
 const Index = () => {
-  const [loading, setLoading] = useState(true);
+  const { data: products = [], isLoading: productsLoading } = useDbProducts();
+  const { data: catData, isLoading: catsLoading } = useDbCategories();
+  const categories = catData?.categories || [];
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 600);
-    return () => clearTimeout(timer);
-  }, []);
+  const loading = productsLoading || catsLoading;
 
   const currentHits = products.slice(0, 5);
   const recommended = products.slice(5, 11);
