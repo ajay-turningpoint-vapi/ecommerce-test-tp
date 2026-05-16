@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
+import BottomNav from "@/components/BottomNav";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = lazy(() => import("./pages/Index"));
@@ -78,6 +79,7 @@ const App = () => (
             <BrowserRouter>
               <Suspense fallback={<PageFallback />}>
                 <ScrollToTop />
+                <div className="pb-14 md:pb-0">
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/category/:slug" element={<Category />} />
@@ -110,6 +112,8 @@ const App = () => (
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </div>
+                <BottomNav />
               </Suspense>
             </BrowserRouter>
           </TooltipProvider>
