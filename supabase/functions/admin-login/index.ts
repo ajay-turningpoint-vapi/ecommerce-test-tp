@@ -1,5 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
-import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.49.4/cors";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -21,7 +25,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Hash the input password with SHA-256 to compare
+    // Hash the input password with SHA-256
     const encoder = new TextEncoder();
     const data = encoder.encode(password);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -42,20 +46,19 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create a simple JWT-like token (signed with service role for verification)
     const token = btoa(JSON.stringify({
       sub: admin.id,
       email: admin.email,
       name: admin.name,
       role: admin.role,
-      exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+      exp: Date.now() + 24 * 60 * 60 * 1000,
     }));
 
     return new Response(
       JSON.stringify({ token, admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role } }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (err) {
+  } catch {
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
