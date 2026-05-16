@@ -24,6 +24,7 @@ export interface Product {
   weight: string;
   pieces?: string;
   serves?: string;
+  specifications?: { key: string; value: string }[];
   variants: ProductVariant[];
   variantAttributes?: Record<string, VariantAttribute[]>;
   ingredients?: string;
