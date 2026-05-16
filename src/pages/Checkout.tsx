@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, X, ChevronDown, ChevronUp, Truck, CreditCard, Smartphone, Banknote, Building } from 'lucide-react';
+import { CheckCircle, X, ChevronDown, ChevronUp, Truck, CreditCard, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import { useCart } from '@/contexts/CartContext';
@@ -47,8 +47,7 @@ const Checkout = () => {
   );
 
   // Payment
-  const [paymentMethod, setPaymentMethod] = useState('upi');
-  const [upiId, setUpiId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cod');
 
   if (items.length === 0) {
     navigate('/cart');
@@ -115,6 +114,7 @@ const Checkout = () => {
       saveOrderAndRedirect('COD');
       return;
     }
+    // Online payment via Razorpay
     const options = {
       key: 'rzp_test_SP6LMvYbb7pF1E',
       amount: totalPrice * 100,
@@ -138,10 +138,8 @@ const Checkout = () => {
   };
 
   const paymentMethods = [
-    { id: 'upi', label: 'UPI', desc: 'Pay by any UPI app', icon: Smartphone },
-    { id: 'card', label: 'Credit/Debit Card', desc: 'Visa, Mastercard & more', icon: CreditCard },
     { id: 'cod', label: 'Cash on Delivery', desc: 'Pay at your doorstep', icon: Banknote },
-    { id: 'netbanking', label: 'NetBanking', desc: 'Pay through your favourite bank', icon: Building },
+    { id: 'online', label: 'Online Payment', desc: 'UPI, Card, NetBanking via Razorpay', icon: CreditCard },
   ];
 
   const inputClass = (err?: string) => `w-full mt-1 rounded-lg border ${err ? 'border-destructive' : 'border-border'} px-3 py-2 text-sm bg-background`;
@@ -328,23 +326,22 @@ const Checkout = () => {
                   </div>
 
                   <div className="rounded-lg border border-border p-6">
-                    {paymentMethod === 'upi' && (
+                    {paymentMethod === 'cod' && (
                       <>
-                        <h3 className="font-bold">Pay with UPI</h3>
-                        <div className="mt-3">
-                          <label className="text-sm font-medium">Enter UPI ID</label>
-                          <input placeholder="yourname@upi" value={upiId} onChange={e => setUpiId(e.target.value)}
-                            className="w-full mt-1 rounded-lg border border-border px-3 py-2 text-sm" />
-                        </div>
+                        <h3 className="font-bold">Cash on Delivery</h3>
+                        <p className="text-sm text-muted-foreground mt-2">Pay when your order arrives at your doorstep. No advance payment needed.</p>
                       </>
                     )}
-                    {paymentMethod === 'card' && <h3 className="font-bold">Enter Card Details</h3>}
-                    {paymentMethod === 'cod' && <h3 className="font-bold">Cash on Delivery</h3>}
-                    {paymentMethod === 'netbanking' && <h3 className="font-bold">Select Bank</h3>}
+                    {paymentMethod === 'online' && (
+                      <>
+                        <h3 className="font-bold">Online Payment</h3>
+                        <p className="text-sm text-muted-foreground mt-2">You'll be redirected to Razorpay to complete payment via UPI, Card, or NetBanking.</p>
+                      </>
+                    )}
 
                     <button onClick={handlePlaceOrder}
                       className="mt-4 md:mt-6 w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground">
-                      Pay ₹{totalPrice}
+                      {paymentMethod === 'cod' ? `Place Order – ₹${totalPrice}` : `Pay ₹${totalPrice}`}
                     </button>
                   </div>
                 </div>
