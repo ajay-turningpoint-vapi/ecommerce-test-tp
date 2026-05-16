@@ -3,6 +3,21 @@ import { Plus, Edit2, Trash2, X, ToggleLeft, ToggleRight } from 'lucide-react';
 import { store, addItem, updateItem, deleteItem, type Banner } from '@/data/adminStore';
 import { toast } from 'sonner';
 
+const BANNER_POSITIONS = [
+  { value: 'hero-slider', label: 'Hero Slider', description: 'Main carousel at top of homepage' },
+  { value: 'strip-top', label: 'Strip Banner (Top)', description: 'Small strip below hero slider' },
+  { value: 'dual-left', label: 'Dual Banner – Left', description: 'Left side of dual banner row' },
+  { value: 'dual-right', label: 'Dual Banner – Right', description: 'Right side of dual banner row' },
+  { value: 'strip-middle', label: 'Strip Banner (Middle)', description: 'Small strip between sections' },
+  { value: 'full-width', label: 'Full-Width Banner', description: 'Wide promotional banner' },
+  { value: 'vertical-left', label: 'Vertical Banner – Left', description: 'Left side in Top Deals section' },
+  { value: 'vertical-right', label: 'Vertical Banner – Right', description: 'Right side in Top Deals section' },
+  { value: 'full-width-bottom', label: 'Full-Width Banner (Bottom)', description: 'Wide banner near page bottom' },
+  { value: 'bottom-horizontal', label: 'Bottom Horizontal Banner', description: 'Horizontal banner above footer' },
+  { value: 'category-top', label: 'Category Page – Top', description: 'Banner at top of category pages' },
+  { value: 'category-middle', label: 'Category Page – Middle', description: 'Banner within category listings' },
+] as const;
+
 const BannerManagement = () => {
   const [banners, setBanners] = useState([...store.banners]);
   const [showForm, setShowForm] = useState(false);
@@ -21,6 +36,11 @@ const BannerManagement = () => {
     if (editing) { updateItem(store.banners, editing.id, data); toast.success('Banner updated'); }
     else { addItem(store.banners, data); toast.success('Banner added'); }
     refresh(); setShowForm(false); setEditing(null);
+  };
+
+  const getPositionLabel = (pos: number | string) => {
+    const found = BANNER_POSITIONS.find(p => p.value === String(pos));
+    return found?.label || `Position ${pos}`;
   };
 
   return (
@@ -43,7 +63,7 @@ const BannerManagement = () => {
                 <h4 className="font-medium text-sm">{b.title}</h4>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${b.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>{b.status}</span>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">Position: {b.position}</p>
+              <p className="text-xs text-muted-foreground mb-3">{getPositionLabel(b.position)}</p>
               <div className="flex gap-1">
                 <button onClick={() => toggleActive(b)} className="p-1.5 rounded hover:bg-muted transition-colors">
                   {b.status === 'active' ? <ToggleRight className="h-4 w-4 text-green-600" /> : <ToggleLeft className="h-4 w-4" />}
@@ -59,7 +79,7 @@ const BannerManagement = () => {
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card rounded-xl border border-border w-full max-w-md p-6 shadow-xl">
+          <div className="bg-card rounded-xl border border-border w-full max-w-md p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-lg font-bold">{editing ? 'Edit Banner' : 'Add Banner'}</h3>
               <button onClick={() => { setShowForm(false); setEditing(null); }}><X className="h-5 w-5" /></button>
@@ -67,18 +87,25 @@ const BannerManagement = () => {
             <form onSubmit={e => {
               e.preventDefault();
               const fd = new FormData(e.currentTarget);
-              save({ title: fd.get('title') as string, imageUrl: (fd.get('imageUrl') as string) || '/placeholder.svg', link: fd.get('link') as string, position: Number(fd.get('position')), status: fd.get('status') as any });
+              save({ title: fd.get('title') as string, imageUrl: (fd.get('imageUrl') as string) || '/placeholder.svg', link: fd.get('link') as string, position: fd.get('position') as any, status: fd.get('status') as any });
             }} className="space-y-4">
               <div><label className="block text-sm font-medium mb-1.5">Title *</label><input name="title" defaultValue={editing?.title} required className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" /></div>
               <div><label className="block text-sm font-medium mb-1.5">Image URL</label><input name="imageUrl" defaultValue={editing?.imageUrl} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" /></div>
               <div><label className="block text-sm font-medium mb-1.5">Link URL</label><input name="link" defaultValue={editing?.link} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-sm font-medium mb-1.5">Position</label><input name="position" type="number" defaultValue={editing?.position ?? 0} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm" /></div>
-                <div><label className="block text-sm font-medium mb-1.5">Status</label>
-                  <select name="status" defaultValue={editing?.status || 'active'} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm">
-                    <option value="active">Active</option><option value="inactive">Inactive</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Placement *</label>
+                <select name="position" defaultValue={editing?.position ?? ''} required className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm">
+                  <option value="" disabled>Select placement…</option>
+                  {BANNER_POSITIONS.map(p => (
+                    <option key={p.value} value={p.value}>{p.label} — {p.description}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1.5">Status</label>
+                <select name="status" defaultValue={editing?.status || 'active'} className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm">
+                  <option value="active">Active</option><option value="inactive">Inactive</option>
+                </select>
               </div>
               <button type="submit" className="w-full rounded-lg bg-primary py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90 transition-colors">Save</button>
             </form>
