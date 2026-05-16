@@ -1,21 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductImageGalleryProps {
   images: string[];
   name: string;
+  activeIndex?: number;
+  onChange?: (index: number) => void;
 }
 
-const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
-  const [selected, setSelected] = useState(0);
+const ProductImageGallery = ({ images, name, activeIndex, onChange }: ProductImageGalleryProps) => {
+  const [internal, setInternal] = useState(0);
+  const selected = activeIndex ?? internal;
 
-  const goTo = (idx: number) => {
-    setSelected((idx + images.length) % images.length);
+  useEffect(() => {
+    if (activeIndex !== undefined) setInternal(activeIndex);
+  }, [activeIndex]);
+
+  const setSelected = (idx: number) => {
+    const next = (idx + images.length) % images.length;
+    setInternal(next);
+    onChange?.(next);
   };
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Main image */}
       <div className="relative rounded-xl overflow-hidden border border-border bg-muted">
         <img
           src={images[selected]}
@@ -25,18 +33,19 @@ const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
           decoding="async"
           fetchPriority="high"
           sizes="(min-width: 768px) 50vw, 100vw"
-          className="w-full aspect-square object-cover"
+          className="w-full aspect-square object-cover transition-opacity duration-300"
+          key={images[selected]}
         />
         {images.length > 1 && (
           <>
             <button
-              onClick={() => goTo(selected - 1)}
+              onClick={() => setSelected(selected - 1)}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
-              onClick={() => goTo(selected + 1)}
+              onClick={() => setSelected(selected + 1)}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
             >
               <ChevronRight className="h-4 w-4" />
@@ -45,7 +54,6 @@ const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
         )}
       </div>
 
-      {/* Thumbnails */}
       {images.length > 1 && (
         <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
           {images.map((img, i) => (
