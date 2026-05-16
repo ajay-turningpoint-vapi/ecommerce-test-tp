@@ -32,7 +32,7 @@ const Index = () => {
       <Header />
 
       {/* Hero Slider */}
-      <section className="mx-4 mt-4 md:mx-6">
+      <section className="container mx-auto px-4 mt-4">
         {banners.length > 0 && <BannerSlider banners={banners} />}
       </section>
 
@@ -47,7 +47,7 @@ const Index = () => {
 
       {/* Dual Banner Row */}
       {banners.length >= 2 && (
-        <section className="mx-4 md:mx-6 mt-8">
+        <section className="container mx-auto px-4 mt-8">
           <DualBanner
             left={{ image: banners[0].image, title: banners[0].alt, subtitle: '', link: banners[0].link || '#' }}
             right={{ image: banners[1].image, title: banners[1].alt, subtitle: '', link: banners[1].link || '#' }}
