@@ -6,12 +6,18 @@ export interface ProductVariant {
   mrp: number;
 }
 
+export interface VariantAttribute {
+  name: string;
+  value: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   slug: string;
   categoryId: string;
   subCategoryId: string;
+  brandName?: string;
   image: string;
   description: string;
   tags: string[];
@@ -19,6 +25,7 @@ export interface Product {
   pieces?: string;
   serves?: string;
   variants: ProductVariant[];
+  variantAttributes?: Record<string, VariantAttribute[]>;
   ingredients?: string;
   howToUse?: string;
   discount: number;

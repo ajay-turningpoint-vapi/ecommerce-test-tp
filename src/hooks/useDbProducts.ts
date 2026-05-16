@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import type { Product, ProductVariant } from '@/types';
+import type { Product, ProductVariant, VariantAttribute } from '@/types';
 
 // Import local images for fallback mapping
 import vitaminCSerum from '@/assets/products/vitamin-c-serum.jpg';
@@ -55,7 +55,10 @@ async function fetchProducts(): Promise<Product[]> {
     .select(`
       id, title, slug, description, category_id, brand_id, status,
       weight, tags, ingredients, how_to_use, delivery_time, discount, pieces, serves,
-      product_variants (id, name, size, price, discount_price, mrp, is_default, sku, status),
+      brands (name),
+      product_variants (id, name, size, price, discount_price, mrp, is_default, sku, status,
+        variant_attribute_values (value, attributes:attribute_id (name))
+      ),
       product_images (image_url, is_thumbnail)
     `)
     .eq('status', 'active')
@@ -64,15 +67,26 @@ async function fetchProducts(): Promise<Product[]> {
   if (error) throw error;
 
   return (dbProducts || []).map((p: any) => {
+    const variantAttributes: Record<string, VariantAttribute[]> = {};
+
     const variants: ProductVariant[] = (p.product_variants || [])
       .sort((a: any, b: any) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0))
-      .map((v: any) => ({
-        id: v.id,
-        name: v.name || v.sku,
-        size: v.size || '',
-        price: Number(v.discount_price ?? v.price),
-        mrp: Number(v.mrp ?? v.price),
-      }));
+      .map((v: any) => {
+        const attrs: VariantAttribute[] = (v.variant_attribute_values || []).map((av: any) => ({
+          name: av.attributes?.name || '',
+          value: av.value,
+        }));
+        if (attrs.length > 0) {
+          variantAttributes[v.id] = attrs;
+        }
+        return {
+          id: v.id,
+          name: v.name || v.sku,
+          size: v.size || '',
+          price: Number(v.discount_price ?? v.price),
+          mrp: Number(v.mrp ?? v.price),
+        };
+      });
 
     const thumbnail = (p.product_images || []).find((img: any) => img.is_thumbnail);
     const dbImage = thumbnail?.image_url || (p.product_images?.[0]?.image_url);
@@ -84,6 +98,7 @@ async function fetchProducts(): Promise<Product[]> {
       slug: p.slug,
       categoryId: p.category_id || '',
       subCategoryId: '',
+      brandName: (p.brands as any)?.name || undefined,
       image,
       description: p.description || '',
       tags: p.tags || [],
@@ -91,6 +106,7 @@ async function fetchProducts(): Promise<Product[]> {
       pieces: p.pieces || undefined,
       serves: p.serves || undefined,
       variants,
+      variantAttributes: Object.keys(variantAttributes).length > 0 ? variantAttributes : undefined,
       ingredients: p.ingredients || undefined,
       howToUse: p.how_to_use || undefined,
       discount: p.discount || 0,
