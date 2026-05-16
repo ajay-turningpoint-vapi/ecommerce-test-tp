@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Plus, Minus, ChevronDown } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { getStockInfo } from '@/lib/stock';
 import type { Product } from '@/types';
 
 interface Props {
@@ -12,6 +13,8 @@ const ProductCard = ({ product }: Props) => {
   const variant = product.variants[0];
   const cartItem = items.find(i => i.product.id === product.id && i.variantId === variant.id);
   const qty = cartItem?.quantity || 0;
+  const stock = getStockInfo(product.id, variant.id);
+  const isOut = stock.status === 'out';
 
   return (
     <div className="group rounded-lg border border-border bg-card overflow-hidden">
