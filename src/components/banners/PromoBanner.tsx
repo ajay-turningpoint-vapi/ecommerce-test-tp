@@ -43,17 +43,9 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
 
   // horizontal (default)
   return (
-    <Link to={link} className={`block rounded-xl overflow-hidden relative group ${className}`}>
+    <Link to={link} className={`block rounded-xl overflow-hidden bg-muted ${className}`}>
       {image ? (
-        <>
-          <img src={image} alt={title} className="w-full h-28 md:h-40 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent flex items-center px-5">
-            <div>
-              <h3 className="text-sm md:text-lg font-bold text-white">{title}</h3>
-              {subtitle && <p className="text-xs text-white/70">{subtitle}</p>}
-            </div>
-          </div>
-        </>
+        <img src={image} alt={title} className="w-full h-auto object-contain" loading="lazy" />
       ) : (
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
           <div>
