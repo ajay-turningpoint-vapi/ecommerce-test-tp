@@ -30,7 +30,7 @@ const Index = () => {
       <Header />
 
       {/* Hero Slider */}
-      <section className="mx-4 mt-4 md:mx-8">
+      <section className="mt-4">
         {banners.length > 0 && <BannerSlider banners={banners} />}
       </section>
 
@@ -45,7 +45,7 @@ const Index = () => {
 
       {/* Dual Banner Row */}
       {banners.length >= 2 && (
-        <section className="mx-4 md:mx-8 mt-8">
+        <section className="mt-8">
           <DualBanner
             left={{ image: banners[0].image, title: banners[0].alt, subtitle: '', link: banners[0].link || '#' }}
             right={{ image: banners[1].image, title: banners[1].alt, subtitle: '', link: banners[1].link || '#' }}
@@ -73,7 +73,7 @@ const Index = () => {
 
       {/* Full-width Banner */}
       {banners.length >= 3 && (
-        <section className="mx-4 md:mx-8 mt-8">
+        <section className="mt-8">
           <PromoBanner image={banners[2].image} title={banners[2].alt} subtitle="" cta="Shop Now" variant="full" link={banners[2].link || '#'} />
         </section>
       )}
@@ -97,7 +97,7 @@ const Index = () => {
 
       {/* Bottom Banner */}
       {banners.length >= 6 && (
-        <section className="mx-4 md:mx-8 mt-8">
+        <section className="mt-8">
           <PromoBanner image={banners[banners.length - 1].image} title={banners[banners.length - 1].alt} variant="horizontal" link={banners[banners.length - 1].link || '#'} />
         </section>
       )}
