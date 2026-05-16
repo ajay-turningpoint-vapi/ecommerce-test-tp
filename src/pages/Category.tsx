@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
@@ -12,6 +12,9 @@ import sale50 from '@/assets/banners/sale-50-off.jpg';
 import glowUp from '@/assets/banners/glow-up-sale.jpg';
 import hairCare from '@/assets/banners/hair-care-week.jpg';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Loader2 } from 'lucide-react';
+
+const ITEMS_PER_PAGE = 8;
 
 const Category = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -19,12 +22,47 @@ const Category = () => {
   const subs = subCategories.filter(s => s.categoryId === category?.id);
   const [activeSub, setActiveSub] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoading(true);
+    setVisibleCount(ITEMS_PER_PAGE);
     const timer = setTimeout(() => setLoading(false), 400);
     return () => clearTimeout(timer);
-  }, [slug]);
+  }, [slug, activeSub]);
+
+  const filteredProducts = products.filter(p => {
+    if (p.categoryId !== category?.id) return false;
+    if (activeSub === 'all') return true;
+    return p.subCategoryId === activeSub;
+  });
+
+  const hasMore = visibleCount < filteredProducts.length;
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProducts.length));
+      setLoadingMore(false);
+    }, 300);
+  }, [loadingMore, hasMore, filteredProducts.length]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    const el = loaderRef.current;
+    if (el) observer.observe(el);
+    return () => { if (el) observer.unobserve(el); };
+  }, [hasMore, loading, loadMore]);
 
   if (!category) {
     return (
@@ -38,17 +76,13 @@ const Category = () => {
     );
   }
 
-  const filteredProducts = products.filter(p => {
-    if (p.categoryId !== category.id) return false;
-    if (activeSub === 'all') return true;
-    return p.subCategoryId === activeSub;
-  });
-
   const categoryBanners = [
     { image: sale50, alt: '50% Off Sale' },
     { image: glowUp, alt: 'Glow Up Sale' },
     { image: hairCare, alt: 'Hair Care Essentials' },
   ];
+
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,20 +141,24 @@ const Category = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           {loading
-            ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-            : filteredProducts.slice(0, 4).map(p => <ProductCard key={p.id} product={p} />)}
+            ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => <ProductCardSkeleton key={i} />)
+            : visibleProducts.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
 
-        {filteredProducts.length > 4 && (
-          <PromoBanner title="Special Offer" subtitle={`Up to 40% off on ${category.name}`} variant="small" link={`/category/${category.slug}`} className="mt-6" />
+        {/* Infinite scroll trigger */}
+        {hasMore && !loading && (
+          <div ref={loaderRef} className="flex justify-center py-8">
+            {loadingMore && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Loading more...
+              </div>
+            )}
+          </div>
         )}
 
-        {filteredProducts.length > 4 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => <ProductCardSkeleton key={i} />)
-              : filteredProducts.slice(4).map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
+        {!hasMore && !loading && filteredProducts.length > ITEMS_PER_PAGE && (
+          <p className="text-center text-sm text-muted-foreground py-6">You've seen all {filteredProducts.length} products</p>
         )}
 
         <div className="mt-10">
