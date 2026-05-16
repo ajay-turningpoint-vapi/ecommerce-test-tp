@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 interface AdminPaginationProps {
@@ -107,5 +108,3 @@ export function usePagination<T>(items: T[], defaultPageSize = 10) {
     totalItems: items.length,
   };
 }
-
-import { useState } from 'react';
