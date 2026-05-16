@@ -48,7 +48,7 @@ const Checkout = () => {
     setStep(2);
   };
 
-  const handlePlaceOrder = () => {
+  const saveOrderAndRedirect = (paymentId: string) => {
     const order: Order = {
       id: Date.now().toString(),
       orderNumber: Math.floor(100000 + Math.random() * 900000).toString(),
@@ -61,12 +61,44 @@ const Checkout = () => {
       savings: totalSavings,
       date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
       status: 'Processing',
+      paymentId,
     };
     const orders = JSON.parse(localStorage.getItem('orders') || '[]');
     orders.push(order);
     localStorage.setItem('orders', JSON.stringify(orders));
     clearCart();
     navigate(`/order/${order.id}`);
+  };
+
+  const handlePlaceOrder = () => {
+    if (paymentMethod === 'cod') {
+      saveOrderAndRedirect('COD');
+      return;
+    }
+
+    const options = {
+      key: 'rzp_test_SP6LMvYbb7pF1E',
+      amount: totalPrice * 100, // Razorpay expects paise
+      currency: 'INR',
+      name: 'Super Beauty',
+      description: `Order of ${totalItems} item(s)`,
+      handler: (response: { razorpay_payment_id: string }) => {
+        toast.success('Payment successful!');
+        saveOrderAndRedirect(response.razorpay_payment_id);
+      },
+      prefill: {
+        name: savedAddress?.name || user?.name || '',
+        email: savedAddress?.email || user?.email || '',
+        contact: savedAddress?.phone || user?.phone || '',
+      },
+      theme: { color: '#e91e63' },
+      modal: {
+        ondismiss: () => toast.error('Payment cancelled'),
+      },
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
   };
 
   const paymentMethods = [
