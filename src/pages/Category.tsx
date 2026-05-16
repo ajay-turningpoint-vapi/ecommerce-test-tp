@@ -93,6 +93,16 @@ const Category = () => {
     });
   }, [categoryProducts, activeFilters]);
 
+  // Sort products
+  const sortedProducts = useMemo(() => {
+    if (sortOrder === 'none') return filteredProducts;
+    return [...filteredProducts].sort((a, b) => {
+      const priceA = a.discountPrice ?? a.price;
+      const priceB = b.discountPrice ?? b.price;
+      return sortOrder === 'low-high' ? priceA - priceB : priceB - priceA;
+    });
+  }, [filteredProducts, sortOrder]);
+
   const activeFilterCount = Object.values(activeFilters).reduce((sum, v) => sum + v.length, 0);
 
   const toggleFilter = (attrName: string, value: string) => {
