@@ -136,9 +136,8 @@ const ProductDetail = () => {
           <ProductDetailSkeleton />
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="rounded-xl overflow-hidden border border-border">
-              <img src={product.image} alt={product.name} className="w-full aspect-square object-cover" />
-            </div>
+            {/* Image gallery with thumbnails */}
+            <ProductImageGallery images={product.images} name={product.name} />
 
             <div>
               <h1 className="text-2xl font-bold">{product.name}</h1>
