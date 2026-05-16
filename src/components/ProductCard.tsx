@@ -18,13 +18,23 @@ const ProductCard = ({ product }: Props) => {
 
   return (
     <div className="group rounded-lg border border-border bg-card overflow-hidden">
-      <Link to={`/product/${product.slug}`} className="block">
+      <Link to={`/product/${product.slug}`} className="block relative">
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
+          className={`w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300 ${isOut ? 'grayscale opacity-70' : ''}`}
         />
+        {isOut && (
+          <span className="absolute top-2 left-2 rounded-md bg-background/95 backdrop-blur px-2 py-0.5 text-[10px] font-bold text-destructive border border-destructive/30">
+            OUT OF STOCK
+          </span>
+        )}
+        {stock.status === 'low' && (
+          <span className="absolute top-2 left-2 rounded-md bg-background/95 backdrop-blur px-2 py-0.5 text-[10px] font-bold text-warning border border-warning/30" style={{ color: 'hsl(var(--destructive))', borderColor: 'hsl(var(--destructive) / 0.3)' }}>
+            {stock.label.toUpperCase()}
+          </span>
+        )}
       </Link>
       <div className="p-3">
         <Link to={`/product/${product.slug}`}>
@@ -43,12 +53,21 @@ const ProductCard = ({ product }: Props) => {
             </>
           )}
         </div>
-        <p className="text-xs text-success mt-1 flex items-center gap-1">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-success" />
-          Delivery in {product.deliveryTime}
-        </p>
+        {!isOut && (
+          <p className="text-xs text-success mt-1 flex items-center gap-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-success" />
+            Delivery in {product.deliveryTime}
+          </p>
+        )}
         <div className="mt-2">
-          {product.variants.length > 1 ? (
+          {isOut ? (
+            <button
+              disabled
+              className="flex items-center justify-center gap-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-muted-foreground w-full cursor-not-allowed"
+            >
+              Out of Stock
+            </button>
+          ) : product.variants.length > 1 ? (
             <Link
               to={`/product/${product.slug}`}
               className="flex items-center justify-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground w-full"
