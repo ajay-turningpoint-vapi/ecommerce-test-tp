@@ -131,10 +131,10 @@ const Category = () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     setTimeout(() => {
-      setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, filteredProducts.length));
+      setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, sortedProducts.length));
       setLoadingMore(false);
     }, 300);
-  }, [loadingMore, hasMore, filteredProducts.length]);
+  }, [loadingMore, hasMore, sortedProducts.length]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
