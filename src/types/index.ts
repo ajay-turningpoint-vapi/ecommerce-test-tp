@@ -4,6 +4,7 @@ export interface ProductVariant {
   size: string;
   price: number;
   mrp: number;
+  image?: string;
 }
 
 export interface VariantAttribute {
