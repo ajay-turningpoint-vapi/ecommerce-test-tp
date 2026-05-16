@@ -1,4 +1,13 @@
 import { products, categories } from './products';
+
+import banner1 from '@/assets/banners/banner-1.jpg';
+import banner2 from '@/assets/banners/banner-2.jpg';
+import banner3 from '@/assets/banners/banner-3.jpg';
+import banner4 from '@/assets/banners/banner-4.jpg';
+import banner5 from '@/assets/banners/banner-5.jpg';
+import banner6 from '@/assets/banners/banner-6.jpg';
+import banner7 from '@/assets/banners/banner-7.jpg';
+import banner8 from '@/assets/banners/banner-8.jpg';
 import type { Order, Address } from '@/types';
 
 const sampleAddress: Address = {
@@ -123,17 +132,29 @@ export interface BannerData {
   link: string; isActive: boolean; startDate: string; endDate: string;
 }
 
+const bannerImages = [banner1, banner2, banner3, banner4, banner5, banner6, banner7, banner8];
+
 export function generateMockBanners(): BannerData[] {
-  const types = ['Homepage', 'Campaign', 'Sale', 'Category'];
-  return types.flatMap((type, ti) =>
-    Array.from({ length: 2 }, (_, i) => ({
-      id: `ban-${ti}-${i}`, title: `${type} Banner ${i + 1}`, type,
-      image: '/placeholder.svg', link: '/',
-      isActive: Math.random() > 0.3,
-      startDate: new Date().toISOString(),
-      endDate: new Date(Date.now() + 30 * 86400000).toISOString(),
-    }))
-  );
+  const items: { title: string; type: string }[] = [
+    { title: 'Summer Sale', type: 'Homepage' },
+    { title: 'New Arrivals', type: 'Homepage' },
+    { title: 'Glow Up Sale', type: 'Campaign' },
+    { title: 'Free Shipping Week', type: 'Campaign' },
+    { title: 'Flat 50% Off', type: 'Sale' },
+    { title: 'Hair Care Week', type: 'Sale' },
+    { title: 'Skincare Essentials', type: 'Category' },
+    { title: 'Makeup Must-Haves', type: 'Category' },
+  ];
+  return items.map((item, i) => ({
+    id: `ban-${i}`,
+    title: item.title,
+    type: item.type,
+    image: bannerImages[i % bannerImages.length],
+    link: '/',
+    isActive: true,
+    startDate: new Date().toISOString(),
+    endDate: new Date(Date.now() + 30 * 86400000).toISOString(),
+  }));
 }
 
 export const adminSettings = {
