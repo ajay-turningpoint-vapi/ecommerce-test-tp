@@ -351,6 +351,16 @@ const Category = () => {
           </div>
         )}
 
+        {!loading && sortedProducts.length === 0 && activeFilterCount === 0 && (
+          <div className="text-center py-16">
+            <p className="text-lg font-semibold">No products in this category yet</p>
+            <p className="text-sm text-muted-foreground mt-1">Check back soon — we're stocking up!</p>
+            <Link to="/" className="inline-block mt-4 rounded-lg bg-primary px-5 py-2 text-sm font-bold text-primary-foreground">
+              Continue Shopping
+            </Link>
+          </div>
+        )}
+
         <div className="mt-10">
           <h2 className="text-lg font-bold italic">Recommended for you</h2>
           <p className="text-sm text-muted-foreground">You might also like these</p>

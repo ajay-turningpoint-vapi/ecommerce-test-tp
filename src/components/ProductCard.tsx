@@ -31,7 +31,7 @@ const ProductCard = ({ product }: Props) => {
           </span>
         )}
         {stock.status === 'low' && (
-          <span className="absolute top-2 left-2 rounded-md bg-background/95 backdrop-blur px-2 py-0.5 text-[10px] font-bold text-warning border border-warning/30" style={{ color: 'hsl(var(--destructive))', borderColor: 'hsl(var(--destructive) / 0.3)' }}>
+          <span className="absolute top-2 left-2 rounded-md bg-background/95 backdrop-blur px-2 py-0.5 text-[10px] font-bold text-destructive border border-destructive/30">
             {stock.label.toUpperCase()}
           </span>
         )}
