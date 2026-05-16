@@ -245,6 +245,10 @@ const Profile = () => {
                             {order.items.map(i => i.product.name).join(', ')}
                           </p>
                         </Link>
+                        {/* Mini Tracker */}
+                        <div className="mt-3 pt-3 border-t border-border">
+                          <OrderTracker status={order.status} orderDate={order.date} />
+                        </div>
                         <div className="flex gap-2 mt-3 pt-3 border-t border-border">
                           {canCancel(order.status) && (
                             <button onClick={() => { setActionModal({ type: 'cancel', order }); setActionReason(''); }}
