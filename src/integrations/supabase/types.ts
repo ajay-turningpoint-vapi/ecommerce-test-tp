@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          password_hash: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          password_hash: string
+          role?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          password_hash?: string
+          role?: string
+        }
+        Relationships: []
+      }
       attributes: {
         Row: {
           created_at: string
@@ -32,6 +59,36 @@ export type Database = {
           id?: string
           name?: string
           type?: string
+        }
+        Relationships: []
+      }
+      banners: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          link: string | null
+          position: number
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          link?: string | null
+          position?: number
+          status?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          link?: string | null
+          position?: number
+          status?: string
+          title?: string
         }
         Relationships: []
       }
@@ -496,6 +553,135 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      refunds: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          order_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          order_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          order_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refunds_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      returns: {
+        Row: {
+          id: string
+          order_item_id: string
+          reason: string
+          requested_at: string
+          status: string
+        }
+        Insert: {
+          id?: string
+          order_item_id: string
+          reason: string
+          requested_at?: string
+          status?: string
+        }
+        Update: {
+          id?: string
+          order_item_id?: string
+          reason?: string
+          requested_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "returns_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_events: {
+        Row: {
+          event_time: string
+          id: string
+          location: string | null
+          shipment_id: string
+          status: string
+        }
+        Insert: {
+          event_time?: string
+          id?: string
+          location?: string | null
+          shipment_id: string
+          status: string
+        }
+        Update: {
+          event_time?: string
+          id?: string
+          location?: string | null
+          shipment_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_events_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shipment_items: {
+        Row: {
+          id: string
+          order_item_id: string
+          shipment_id: string
+        }
+        Insert: {
+          id?: string
+          order_item_id: string
+          shipment_id: string
+        }
+        Update: {
+          id?: string
+          order_item_id?: string
+          shipment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipment_items_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shipment_items_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
             referencedColumns: ["id"]
           },
         ]
