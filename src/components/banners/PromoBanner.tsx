@@ -15,9 +15,9 @@ interface PromoBannerProps {
 const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horizontal', bgColor, className = '' }: PromoBannerProps) => {
   if (variant === 'full' && image) {
     return (
-      <Link to={link} className={`block overflow-hidden relative group bg-muted ${className}`}>
-        <div className="aspect-video">
-          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
+      <Link to={link} className={`block rounded-2xl overflow-hidden relative group ${className}`}>
+        <div className="aspect-[16/9]">
+          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
         </div>
       </Link>
     );
@@ -37,9 +37,9 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
 
   if (variant === 'vertical' && image) {
     return (
-      <Link to={link} className={`block overflow-hidden bg-muted ${className}`}>
-        <div className="aspect-video">
-          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
+      <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
+        <div className="aspect-[16/9]">
+          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
         </div>
       </Link>
     );
@@ -47,10 +47,10 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
 
   // horizontal (default)
   return (
-    <Link to={link} className={`block overflow-hidden bg-muted ${className}`}>
+    <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
       {image ? (
-        <div className="aspect-video">
-          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
+        <div className="aspect-[16/9]">
+          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
         </div>
       ) : (
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
