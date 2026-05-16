@@ -122,6 +122,7 @@ const Category = () => {
 
   const clearFilters = () => {
     setActiveFilters({});
+    setSortOrder('none');
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
