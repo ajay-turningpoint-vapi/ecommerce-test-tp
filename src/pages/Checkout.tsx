@@ -229,7 +229,7 @@ const Checkout = () => {
 
                     <button
                       onClick={handlePlaceOrder}
-                      className="mt-6 w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground"
+                      className="mt-4 md:mt-6 w-full rounded-lg bg-primary py-3 text-sm font-bold text-primary-foreground"
                     >
                       Pay ₹{totalPrice}
                     </button>
