@@ -22,7 +22,11 @@ const ProductCard = ({ product }: Props) => {
           loading="lazy"
           className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {qty === 0 ? (
+        {product.variants.length > 1 ? (
+          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+            View Variants
+          </span>
+        ) : qty === 0 ? (
           <button
             onClick={e => {
               e.preventDefault();
