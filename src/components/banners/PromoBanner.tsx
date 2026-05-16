@@ -16,7 +16,9 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   if (variant === 'full' && image) {
     return (
       <Link to={link} className={`block rounded-xl overflow-hidden relative group bg-muted ${className}`}>
-        <img src={image} alt={title} className="w-full h-auto object-contain" loading="lazy" />
+        <div className="aspect-video">
+          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+        </div>
       </Link>
     );
   }
@@ -36,7 +38,9 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   if (variant === 'vertical' && image) {
     return (
       <Link to={link} className={`block rounded-xl overflow-hidden bg-muted ${className}`}>
-        <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+        <div className="aspect-[9/16] sm:aspect-[3/4]">
+          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+        </div>
       </Link>
     );
   }
@@ -45,8 +49,9 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   return (
     <Link to={link} className={`block rounded-xl overflow-hidden bg-muted ${className}`}>
       {image ? (
-        <img src={image} alt={title} className="w-full h-auto object-contain" loading="lazy" />
-      ) : (
+        <div className="aspect-video">
+          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+        </div>
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
           <div>
             <h3 className="text-sm md:text-base font-bold">{title}</h3>
