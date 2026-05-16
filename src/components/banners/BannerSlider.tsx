@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+interface BannerItem {
+  image: string;
+  mobileImage?: string;
+  alt: string;
+  link?: string;
+}
+
 interface BannerSliderProps {
-  banners: { image: string; alt: string; link?: string }[];
+  banners: BannerItem[];
   autoPlay?: boolean;
   interval?: number;
   className?: string;
@@ -22,7 +29,13 @@ const BannerSlider = ({ banners, autoPlay = true, interval = 3500, className = '
       <div className="flex transition-transform duration-500 ease-out" style={{ transform: `translateX(-${current * 100}%)` }}>
         {banners.map((b, i) => (
           <div key={i} className="w-full shrink-0 aspect-[16/9] md:max-h-[400px] lg:max-h-[450px]">
-            <img src={b.image} alt={b.alt} className="w-full h-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} />
+            <picture>
+              {b.mobileImage && (
+                <source media="(max-width: 767px)" srcSet={b.mobileImage} />
+              )}
+              <source media="(min-width: 768px)" srcSet={b.image} />
+              <img src={b.image} alt={b.alt} className="w-full h-full object-cover" loading={i === 0 ? 'eager' : 'lazy'} />
+            </picture>
           </div>
         ))}
       </div>
