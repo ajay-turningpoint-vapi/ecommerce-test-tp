@@ -13,6 +13,7 @@ const ProductManagement = () => {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<AdminProduct | null>(null);
   const [managingProduct, setManagingProduct] = useState<AdminProduct | null>(null);
+  const [_prodPage, _setProdPage] = useState(1);
 
   const refresh = useCallback(() => setProducts([...store.products]), []);
 
