@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Package, MapPin, LogOut, Plus, Edit2, Trash2, X, Camera, RotateCcw, ArrowLeftRight, Ban } from 'lucide-react';
+import { User, Package, MapPin, LogOut, Plus, Edit2, Trash2, X, Camera, RotateCcw, ArrowLeftRight, Ban, HelpCircle, ChevronDown, ChevronUp, Mail, Phone, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
