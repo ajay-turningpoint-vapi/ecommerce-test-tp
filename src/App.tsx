@@ -36,6 +36,7 @@ const ReturnsManagement = lazy(() => import("./pages/admin/ReturnsManagement"));
 const BannerManagement = lazy(() => import("./pages/admin/BannerManagement"));
 const Reports = lazy(() => import("./pages/admin/Reports"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const DiscountManagement = lazy(() => import("./pages/admin/DiscountManagement"));
 
 const queryClient = new QueryClient();
 
