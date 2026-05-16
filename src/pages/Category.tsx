@@ -41,6 +41,7 @@ const Category = () => {
     setVisibleCount(ITEMS_PER_PAGE);
     setActiveSub('all');
     setActiveFilters({});
+    setSortOrder('none');
   }, [slug]);
 
   // Products in this category (before attribute filters)
