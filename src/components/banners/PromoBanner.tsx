@@ -35,14 +35,8 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
 
   if (variant === 'vertical' && image) {
     return (
-      <Link to={link} className={`block rounded-xl overflow-hidden relative group ${className}`}>
-        <img src={image} alt={title} className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
-          <div>
-            <h3 className="text-base font-bold text-white">{title}</h3>
-            {subtitle && <p className="text-xs text-white/80 mt-0.5">{subtitle}</p>}
-          </div>
-        </div>
+      <Link to={link} className={`block rounded-xl overflow-hidden bg-muted ${className}`}>
+        <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
       </Link>
     );
   }
