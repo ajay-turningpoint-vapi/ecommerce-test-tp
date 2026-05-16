@@ -192,7 +192,7 @@ const Checkout = () => {
                 <h2 className="text-xl font-bold">Choose payment method</h2>
                 <p className="text-sm text-muted-foreground">Choose the payment method you prefer</p>
 
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <div className="space-y-1">
                     <h3 className="text-sm font-bold mb-2">Payment Method Options</h3>
                     {paymentMethods.map(pm => (
