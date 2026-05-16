@@ -207,7 +207,7 @@ const Category = () => {
                         ? 'border-primary'
                         : 'border-border'
                     }`}>
-                      <img src={sub.image} alt={sub.name} className="w-full h-full object-cover" />
+                      <img src={sub.image} alt={sub.name} loading="lazy" decoding="async" width={80} height={80} sizes="80px" className="w-full h-full object-cover" />
                     </div>
                     <span className="text-xs font-medium">{sub.name}</span>
                   </button>

@@ -55,6 +55,11 @@ const Categories = () => {
                 <img
                   src={cat.image}
                   alt={cat.name}
+                  loading="lazy"
+                  decoding="async"
+                  width={80}
+                  height={80}
+                  sizes="80px"
                   className="h-16 w-16 md:h-20 md:w-20 object-cover rounded-full"
                 />
                 <span className="text-xs md:text-sm font-medium text-center leading-tight">{cat.name}</span>
