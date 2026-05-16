@@ -469,8 +469,11 @@ export type Database = {
           discount_price: number | null
           id: string
           is_default: boolean
+          mrp: number | null
+          name: string | null
           price: number
           product_id: string
+          size: string | null
           sku: string
           status: string
         }
@@ -480,8 +483,11 @@ export type Database = {
           discount_price?: number | null
           id?: string
           is_default?: boolean
+          mrp?: number | null
+          name?: string | null
           price: number
           product_id: string
+          size?: string | null
           sku: string
           status?: string
         }
@@ -491,8 +497,11 @@ export type Database = {
           discount_price?: number | null
           id?: string
           is_default?: boolean
+          mrp?: number | null
+          name?: string | null
           price?: number
           product_id?: string
+          size?: string | null
           sku?: string
           status?: string
         }
@@ -511,34 +520,58 @@ export type Database = {
           brand_id: string | null
           category_id: string | null
           created_at: string
+          delivery_time: string | null
           description: string | null
+          discount: number | null
+          how_to_use: string | null
           id: string
+          ingredients: string | null
+          pieces: string | null
+          serves: string | null
           slug: string
           status: string
+          tags: string[] | null
           title: string
           updated_at: string
+          weight: string | null
         }
         Insert: {
           brand_id?: string | null
           category_id?: string | null
           created_at?: string
+          delivery_time?: string | null
           description?: string | null
+          discount?: number | null
+          how_to_use?: string | null
           id?: string
+          ingredients?: string | null
+          pieces?: string | null
+          serves?: string | null
           slug: string
           status?: string
+          tags?: string[] | null
           title: string
           updated_at?: string
+          weight?: string | null
         }
         Update: {
           brand_id?: string | null
           category_id?: string | null
           created_at?: string
+          delivery_time?: string | null
           description?: string | null
+          discount?: number | null
+          how_to_use?: string | null
           id?: string
+          ingredients?: string | null
+          pieces?: string | null
+          serves?: string | null
           slug?: string
           status?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string
+          weight?: string | null
         }
         Relationships: [
           {
