@@ -168,7 +168,7 @@ const Category = () => {
     { image: hairCare, alt: 'Hair Care Essentials' },
   ];
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const visibleProducts = sortedProducts.slice(0, visibleCount);
 
   return (
     <div className="min-h-screen bg-background">
