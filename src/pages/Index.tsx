@@ -5,6 +5,7 @@ import ProductCard from '@/components/ProductCard';
 import BannerSlider from '@/components/banners/BannerSlider';
 import PromoBanner from '@/components/banners/PromoBanner';
 import DualBanner from '@/components/banners/DualBanner';
+import RecentlyViewed from '@/components/RecentlyViewed';
 import { useDbProducts } from '@/hooks/useDbProducts';
 import { useDbCategories } from '@/hooks/useDbCategories';
 import { useSyncExternalStore } from 'react';
@@ -103,6 +104,11 @@ const Index = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4">
           {recommended.map(p => <ProductCard key={p.id} product={p} />)}
         </div>
+      </section>
+
+      {/* Recently Viewed */}
+      <section className="container mx-auto px-4">
+        <RecentlyViewed limit={5} />
       </section>
 
       <Footer />

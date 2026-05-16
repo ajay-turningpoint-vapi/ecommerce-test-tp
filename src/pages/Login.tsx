@@ -63,7 +63,14 @@ const Login = () => {
               </div>
             )}
             <div>
-              <label className="text-sm font-medium">Password</label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">Password</label>
+                {!isSignup && (
+                  <Link to="/forgot-password" className="text-xs text-primary font-medium hover:underline">
+                    Forgot password?
+                  </Link>
+                )}
+              </div>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                 className="w-full mt-1 rounded-lg border border-border px-3 py-2 text-sm" placeholder="••••••••" />
             </div>
