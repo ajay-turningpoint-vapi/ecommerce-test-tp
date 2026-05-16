@@ -10,8 +10,6 @@ import { useDbProducts } from '@/hooks/useDbProducts';
 import { useDbCategories } from '@/hooks/useDbCategories';
 import { useSyncExternalStore } from 'react';
 import { getBanners, subscribe, getVersion } from '@/data/adminSharedData';
-import bannerDesktop from '@/assets/banners/banner-desktop.jpg';
-import bannerMobile from '@/assets/banners/banner-mobile.jpg';
 
 const Index = () => {
   useSyncExternalStore(subscribe, getVersion, getVersion);
@@ -22,7 +20,7 @@ const Index = () => {
   const allBanners = getBanners();
   const banners = allBanners
     .filter(b => b.isActive)
-    .map(b => ({ image: b.image, mobileImage: bannerMobile, alt: b.title, link: b.link || undefined }));
+    .map(b => ({ image: b.image, alt: b.title, link: b.link || undefined }));
 
   const currentHits = products.slice(0, 5);
   const recommended = products.slice(5, 11);
