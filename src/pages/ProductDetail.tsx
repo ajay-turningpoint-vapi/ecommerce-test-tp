@@ -125,6 +125,21 @@ const ProductDetail = () => {
                 </div>
               )}
 
+              {/* Variant Attributes */}
+              {variant && product.variantAttributes?.[variant.id] && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-bold mb-2">Specifications</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {product.variantAttributes[variant.id].map((attr, i) => (
+                      <div key={i} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
+                        <span className="text-xs text-muted-foreground">{attr.name}:</span>
+                        <span className="text-xs font-medium">{attr.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-4 mt-6">
                 <div>
                   <span className="text-2xl font-bold">₹{variant.price}</span>
