@@ -15,15 +15,8 @@ interface PromoBannerProps {
 const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horizontal', bgColor, className = '' }: PromoBannerProps) => {
   if (variant === 'full' && image) {
     return (
-      <Link to={link} className={`block rounded-xl overflow-hidden relative group ${className}`}>
-        <img src={image} alt={title} className="w-full h-36 md:h-52 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-6">
-          <div>
-            <h3 className="text-lg md:text-2xl font-bold text-white">{title}</h3>
-            {subtitle && <p className="text-xs md:text-sm text-white/80 mt-1">{subtitle}</p>}
-            {cta && <span className="inline-flex items-center gap-1 text-xs font-bold text-white mt-2 border-b border-white/50">{cta} <ArrowRight className="h-3 w-3" /></span>}
-          </div>
-        </div>
+      <Link to={link} className={`block rounded-xl overflow-hidden relative group bg-muted ${className}`}>
+        <img src={image} alt={title} className="w-full h-auto object-contain" loading="lazy" />
       </Link>
     );
   }
