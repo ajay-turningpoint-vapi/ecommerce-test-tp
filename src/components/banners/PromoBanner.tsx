@@ -17,7 +17,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
     return (
       <Link to={link} className={`block rounded-2xl overflow-hidden relative group ${className}`}>
         <div className="aspect-[16/9]">
-          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       </Link>
     );
@@ -39,7 +39,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
     return (
       <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
         <div className="aspect-[16/9]">
-          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       </Link>
     );
@@ -50,7 +50,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
     <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
       {image ? (
         <div className="aspect-[16/9]">
-          <img src={image} alt={title} className="w-full h-full object-contain" loading="lazy" />
+          <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       ) : (
         <div className={`flex items-center justify-between px-5 py-4 ${bgColor || 'bg-accent'}`}>
