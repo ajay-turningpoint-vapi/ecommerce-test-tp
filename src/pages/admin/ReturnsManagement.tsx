@@ -1,30 +1,24 @@
-import { useState } from 'react';
-import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
-import { CheckCircle, XCircle, Eye, X } from 'lucide-react';
-import { store } from '@/data/adminStore';
-import { toast } from 'sonner';
+import { useState, useMemo } from 'react';
+import AdminPagination from '@/components/admin/AdminPagination';
+import { Eye, X } from 'lucide-react';
+import { getReturns } from '@/data/adminSharedData';
 
 const statusColors: Record<string, string> = {
-  REQUESTED: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  APPROVED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  PICKED: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  REFUNDED: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  Pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  Approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  Rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  Refunded: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
 };
 
 const ReturnsManagement = () => {
-  const [returns, setReturns] = useState([...store.returns]);
+  const returns = useMemo(() => getReturns(), []);
   const [selected, setSelected] = useState<any>(null);
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 10;
 
-  const updateStatus = (id: string, status: string) => {
-    const r = store.returns.find(r => r.id === id);
-    if (r) { r.status = status; setReturns([...store.returns]); toast.success(`Return ${status.toLowerCase()}`); }
-  };
-
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Returns & Refunds</h2>
+      <h2 className="text-2xl font-bold">Returns & Refunds ({returns.length})</h2>
       <div className="overflow-x-auto rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
           <thead><tr className="border-b border-border bg-muted/50">
@@ -47,18 +41,7 @@ const ReturnsManagement = () => {
                 <td className="px-4 py-3">₹{r.refundAmount}</td>
                 <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[r.status] || 'bg-muted'}`}>{r.status}</span></td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-1">
-                    <button onClick={() => setSelected(r)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
-                    {r.status === 'REQUESTED' && (
-                      <>
-                        <button onClick={() => updateStatus(r.id, 'APPROVED')} className="p-1.5 rounded hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"><CheckCircle className="h-4 w-4 text-green-600" /></button>
-                        <button onClick={() => updateStatus(r.id, 'REFUNDED')} className="p-1.5 rounded hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"><XCircle className="h-4 w-4 text-destructive" /></button>
-                      </>
-                    )}
-                    {r.status === 'APPROVED' && (
-                      <button onClick={() => updateStatus(r.id, 'REFUNDED')} className="px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-xs font-medium">Refund</button>
-                    )}
-                  </div>
+                  <button onClick={() => setSelected(r)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
                 </td>
               </tr>
             ));})()}

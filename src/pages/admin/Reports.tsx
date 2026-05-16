@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { generateMockOrders, generateMockCustomers } from '@/data/adminMockData';
-import { categories } from '@/data/products';
+import { getOrders, getCustomers, categories } from '@/data/adminSharedData';
 
 const COLORS = ['hsl(346,77%,50%)', 'hsl(142,71%,45%)', 'hsl(200,80%,50%)', 'hsl(40,90%,50%)', 'hsl(280,60%,50%)'];
 const tabs = ['Sales', 'Orders', 'Products', 'Customers', 'Returns', 'Revenue'];
 
 const Reports = () => {
   const [tab, setTab] = useState('Sales');
-  const orders = useMemo(() => generateMockOrders(100), []);
-  const customers = useMemo(() => generateMockCustomers(30), []);
+  const orders = useMemo(() => getOrders(), []);
+  const customers = useMemo(() => getCustomers(), []);
 
   const dailyRevenue = useMemo(() => {
     const map: Record<string, number> = {};

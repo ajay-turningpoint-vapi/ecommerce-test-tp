@@ -1,23 +1,23 @@
 import { useState, useMemo } from 'react';
-import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
+import AdminPagination from '@/components/admin/AdminPagination';
 import { Eye, X, Search } from 'lucide-react';
-import { store } from '@/data/adminStore';
+import { getOrders } from '@/data/adminSharedData';
 import { toast } from 'sonner';
 
 const statusColors: Record<string, string> = {
-  ORDER_PLACED: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-  CONFIRMED: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  PACKED: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-  SHIPPED: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-  DELIVERED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-  CANCELLED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-  RETURN_REQUESTED: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
+  Pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  Confirmed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  Packed: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  Shipped: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+  Delivered: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  Cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  'Return Requested': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
 };
 
-const allStatuses = ['ORDER_PLACED', 'CONFIRMED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURN_REQUESTED'];
+const allStatuses = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested'];
 
 const OrderManagement = () => {
-  const [orders, setOrders] = useState([...store.orders]);
+  const orders = useMemo(() => getOrders(), []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -27,18 +27,12 @@ const OrderManagement = () => {
   const filtered = useMemo(() =>
     orders.filter(o => {
       const matchSearch = o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
-        o.customerName.toLowerCase().includes(search.toLowerCase());
+        o.address.name.toLowerCase().includes(search.toLowerCase());
       const matchStatus = statusFilter === 'All' || o.status === statusFilter;
       return matchSearch && matchStatus;
     }),
     [orders, search, statusFilter]
   );
-
-  const updateStatus = (id: string, status: string) => {
-    const order = store.orders.find(o => o.id === id);
-    if (order) { order.status = status; setOrders([...store.orders]); toast.success(`Status updated to ${status.replace(/_/g, ' ')}`); }
-    setSelectedId(null);
-  };
 
   const detail = selectedId ? orders.find(o => o.id === selectedId) : null;
 
@@ -54,7 +48,7 @@ const OrderManagement = () => {
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
           <option>All</option>
-          {allStatuses.map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
+          {allStatuses.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
@@ -73,16 +67,15 @@ const OrderManagement = () => {
             {(() => {
               const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
               const safePage = Math.min(page, totalPages);
-              const paginated = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-              return paginated.map(o => (
+              return filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE).map(o => (
               <tr key={o.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                 <td className="px-4 py-3 font-medium">{o.orderNumber}</td>
-                <td className="px-4 py-3">{o.customerName}</td>
-                <td className="px-4 py-3">{new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
-                <td className="px-4 py-3 font-medium">₹{o.totalAmount}</td>
-                <td className="px-4 py-3">{o.paymentStatus}</td>
+                <td className="px-4 py-3">{o.address.name}</td>
+                <td className="px-4 py-3">{new Date(o.date).toLocaleDateString('en-IN')}</td>
+                <td className="px-4 py-3 font-medium">₹{o.total}</td>
+                <td className="px-4 py-3">{o.paymentMethod}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[o.status] || 'bg-muted'}`}>{o.status.replace(/_/g, ' ')}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[o.status] || 'bg-muted'}`}>{o.status}</span>
                 </td>
                 <td className="px-4 py-3">
                   <button onClick={() => setSelectedId(o.id)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
@@ -104,34 +97,32 @@ const OrderManagement = () => {
             </div>
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-2 gap-2">
-                <div><span className="text-muted-foreground">Customer:</span> {detail.customerName}</div>
-                <div><span className="text-muted-foreground">Email:</span> {detail.customerEmail}</div>
-                <div><span className="text-muted-foreground">Phone:</span> {detail.phone}</div>
-                <div><span className="text-muted-foreground">Payment:</span> {detail.paymentMethod} ({detail.paymentStatus})</div>
-                <div><span className="text-muted-foreground">Address:</span> {detail.address}, {detail.city} - {detail.pincode}</div>
-                <div><span className="text-muted-foreground">Total:</span> <strong>₹{detail.totalAmount}</strong></div>
+                <div><span className="text-muted-foreground">Customer:</span> {detail.address.name}</div>
+                <div><span className="text-muted-foreground">Email:</span> {detail.address.email}</div>
+                <div><span className="text-muted-foreground">Phone:</span> {detail.address.phone}</div>
+                <div><span className="text-muted-foreground">Payment:</span> {detail.paymentMethod}</div>
+                <div><span className="text-muted-foreground">Address:</span> {detail.address.house}, {detail.address.road}, {detail.address.city} - {detail.address.pincode}</div>
+                <div><span className="text-muted-foreground">Total:</span> <strong>₹{detail.total}</strong></div>
               </div>
               <hr className="border-border" />
               <div>
                 <p className="font-medium mb-1">Items</p>
-                {detail.items.map((item, i) => (
-                  <div key={i} className="flex justify-between py-1">
-                    <span>{item.productName} ({item.variantSku}) × {item.qty}</span>
-                    <span>₹{item.price * item.qty}</span>
-                  </div>
-                ))}
+                {detail.items.map((item, i) => {
+                  const variant = item.product.variants.find(v => v.id === item.variantId);
+                  return (
+                    <div key={i} className="flex justify-between py-1">
+                      <span>{item.product.name} ({variant?.name || item.variantId}) × {item.quantity}</span>
+                      <span>₹{(variant?.price || 0) * item.quantity}</span>
+                    </div>
+                  );
+                })}
               </div>
               <hr className="border-border" />
-              <div>
-                <p className="font-medium mb-2">Update Status</p>
-                <div className="flex flex-wrap gap-2">
-                  {allStatuses.map(s => (
-                    <button key={s} onClick={() => updateStatus(detail.id, s)}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium border transition-colors ${detail.status === s ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}>
-                      {s.replace(/_/g, ' ')}
-                    </button>
-                  ))}
-                </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>Subtotal: ₹{detail.subtotal}</div>
+                <div>Delivery: ₹{detail.delivery}</div>
+                <div>Savings: ₹{detail.savings}</div>
+                <div className="font-bold">Total: ₹{detail.total}</div>
               </div>
             </div>
           </div>

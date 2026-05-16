@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react';
-import AdminPagination, { usePagination } from '@/components/admin/AdminPagination';
-import { Search, Ban, CheckCircle, Eye, X } from 'lucide-react';
-import { store } from '@/data/adminStore';
-import { toast } from 'sonner';
+import AdminPagination from '@/components/admin/AdminPagination';
+import { Search, Eye, X } from 'lucide-react';
+import { getCustomers } from '@/data/adminSharedData';
 
 const CustomerManagement = () => {
-  const [customers, setCustomers] = useState([...store.customers]);
+  const customers = useMemo(() => getCustomers(), []);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<any>(null);
   const [page, setPage] = useState(1);
@@ -16,14 +15,9 @@ const CustomerManagement = () => {
     [customers, search]
   );
 
-  const toggleBlock = (id: string) => {
-    const c = store.customers.find(c => c.id === id);
-    if (c) { c.status = c.status === 'active' ? 'blocked' : 'active'; setCustomers([...store.customers]); toast.success('Customer status updated'); }
-  };
-
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Customers</h2>
+      <h2 className="text-2xl font-bold">Customers ({customers.length})</h2>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search customers..."
@@ -52,15 +46,10 @@ const CustomerManagement = () => {
                 <td className="px-4 py-3">₹{c.totalSpent.toLocaleString()}</td>
                 <td className="px-4 py-3">{new Date(c.joinDate).toLocaleDateString('en-IN')}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>{c.status}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}`}>{c.status}</span>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-1">
-                    <button onClick={() => setSelected(c)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
-                    <button onClick={() => toggleBlock(c.id)} className="p-1.5 rounded hover:bg-muted transition-colors">
-                      {c.status === 'active' ? <Ban className="h-4 w-4 text-destructive" /> : <CheckCircle className="h-4 w-4 text-green-600" />}
-                    </button>
-                  </div>
+                  <button onClick={() => setSelected(c)} className="p-1.5 rounded hover:bg-muted transition-colors"><Eye className="h-4 w-4" /></button>
                 </td>
               </tr>
             ));})()}
@@ -84,7 +73,7 @@ const CustomerManagement = () => {
               <p><span className="text-muted-foreground">Total Orders:</span> {selected.totalOrders}</p>
               <p><span className="text-muted-foreground">Total Spent:</span> ₹{selected.totalSpent.toLocaleString()}</p>
               <p><span className="text-muted-foreground">Joined:</span> {new Date(selected.joinDate).toLocaleDateString('en-IN')}</p>
-              <p><span className="text-muted-foreground">Status:</span> <span className={selected.status === 'active' ? 'text-green-600' : 'text-destructive'}>{selected.status}</span></p>
+              <p><span className="text-muted-foreground">Status:</span> <span className={selected.status === 'Active' ? 'text-green-600' : 'text-destructive'}>{selected.status}</span></p>
             </div>
           </div>
         </div>

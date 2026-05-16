@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { adminSettings } from '@/data/adminMockData';
+import { adminSettings } from '@/data/adminSharedData';
 import { toast } from 'sonner';
 
 const AdminSettings = () => {
@@ -14,7 +14,6 @@ const AdminSettings = () => {
       <h2 className="text-2xl font-bold">Settings</h2>
 
       <div className="rounded-xl border border-border bg-card p-6 space-y-6">
-        {/* Shipping */}
         <div>
           <h3 className="font-semibold mb-3">Shipping Charges</h3>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -33,7 +32,6 @@ const AdminSettings = () => {
 
         <hr className="border-border" />
 
-        {/* Tax */}
         <div>
           <h3 className="font-semibold mb-3">Tax (GST)</h3>
           <div>
@@ -45,7 +43,6 @@ const AdminSettings = () => {
 
         <hr className="border-border" />
 
-        {/* Return Window */}
         <div>
           <h3 className="font-semibold mb-3">Return Policy</h3>
           <div>
@@ -57,7 +54,6 @@ const AdminSettings = () => {
 
         <hr className="border-border" />
 
-        {/* COD */}
         <div>
           <h3 className="font-semibold mb-3">Cash on Delivery</h3>
           <div className="grid sm:grid-cols-2 gap-4">
