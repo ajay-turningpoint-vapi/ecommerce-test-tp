@@ -25,6 +25,19 @@ interface AddressFormData {
 
 const emptyAddress: AddressFormData = { name: '', phone: '', house: '', road: '', landmark: '', city: '', state: '', pincode: '' };
 
+const FaqItem = ({ question, answer }: { question: string; answer: string }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-lg border border-border">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-3 text-left">
+        <span className="text-sm font-medium">{question}</span>
+        {open ? <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" /> : <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />}
+      </button>
+      {open && <p className="px-3 pb-3 text-xs text-muted-foreground">{answer}</p>}
+    </div>
+  );
+};
+
 const Profile = () => {
   const { user, logout, updateProfile } = useAuth();
   const navigate = useNavigate();
