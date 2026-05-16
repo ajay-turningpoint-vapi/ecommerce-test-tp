@@ -16,6 +16,7 @@ import { useDbCategories } from '@/hooks/useDbCategories';
 import { useCart } from '@/contexts/CartContext';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { getStockInfo } from '@/lib/stock';
+import { generateVariantSwatch } from '@/lib/variantImage';
 import freeShipping from '@/assets/banners/free-shipping.jpg';
 import glowUp from '@/assets/banners/glow-up-sale.jpg';
 import newArrivals from '@/assets/banners/new-arrivals.jpg';
