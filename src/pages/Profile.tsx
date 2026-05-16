@@ -360,6 +360,67 @@ const Profile = () => {
                 )}
               </div>
             )}
+
+            {/* Help Tab */}
+            {activeTab === 'help' && (
+              <div>
+                <h2 className="text-lg font-bold">Help & Support</h2>
+                <p className="text-sm text-muted-foreground mt-1">We're here to help you with anything</p>
+
+                {/* Contact Options */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                  <a href="mailto:support@superbeauty.com" className="rounded-lg border border-border p-4 text-center hover:border-primary hover:bg-primary/5 transition-colors">
+                    <Mail className="h-6 w-6 mx-auto text-primary" />
+                    <p className="font-medium text-sm mt-2">Email Us</p>
+                    <p className="text-xs text-muted-foreground mt-1">support@superbeauty.com</p>
+                  </a>
+                  <a href="tel:+911234567890" className="rounded-lg border border-border p-4 text-center hover:border-primary hover:bg-primary/5 transition-colors">
+                    <Phone className="h-6 w-6 mx-auto text-primary" />
+                    <p className="font-medium text-sm mt-2">Call Us</p>
+                    <p className="text-xs text-muted-foreground mt-1">+91 123 456 7890</p>
+                  </a>
+                  <a href="https://wa.me/911234567890" target="_blank" rel="noreferrer" className="rounded-lg border border-border p-4 text-center hover:border-primary hover:bg-primary/5 transition-colors">
+                    <MessageCircle className="h-6 w-6 mx-auto text-primary" />
+                    <p className="font-medium text-sm mt-2">WhatsApp</p>
+                    <p className="text-xs text-muted-foreground mt-1">Chat with us</p>
+                  </a>
+                </div>
+
+                {/* FAQs */}
+                <h3 className="font-bold mt-6 mb-3">Frequently Asked Questions</h3>
+                <div className="space-y-2">
+                  {[
+                    { q: 'How do I track my order?', a: 'Go to the Orders tab and click on any order to see real-time tracking with delivery timeline.' },
+                    { q: 'What is the return policy?', a: 'We accept returns within 7 days of delivery. The product must be unused and in original packaging. Go to Orders → click Return.' },
+                    { q: 'How do I exchange a product?', a: 'Go to Orders tab, find your delivered order, and click Exchange. Select a reason and upload a product photo.' },
+                    { q: 'How long does delivery take?', a: 'Standard delivery takes 3-5 business days. Express delivery is available for select pincodes.' },
+                    { q: 'How do I cancel an order?', a: 'You can cancel orders before they are shipped. Go to Orders tab and click Cancel on the order.' },
+                    { q: 'Are the products authentic?', a: 'Yes! We source all products directly from brands and authorized distributors. 100% genuine guaranteed.' },
+                    { q: 'How do I change my delivery address?', a: 'Go to the Addresses tab to add, edit, or set a default address. You can also change address during checkout.' },
+                    { q: 'What payment methods are accepted?', a: 'We accept UPI, Credit/Debit cards, Net Banking, and Cash on Delivery.' },
+                  ].map((faq, i) => (
+                    <FaqItem key={i} question={faq.q} answer={faq.a} />
+                  ))}
+                </div>
+
+                {/* Policies */}
+                <h3 className="font-bold mt-6 mb-3">Policies</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="rounded-lg border border-border p-4">
+                    <p className="font-medium">Shipping Policy</p>
+                    <p className="text-muted-foreground text-xs mt-1">Free shipping on all orders. Standard delivery in 3-5 business days.</p>
+                  </div>
+                  <div className="rounded-lg border border-border p-4">
+                    <p className="font-medium">Return & Exchange Policy</p>
+                    <p className="text-muted-foreground text-xs mt-1">7-day easy returns. Product must be unused with original packaging. Refund within 5-7 business days.</p>
+                  </div>
+                  <div className="rounded-lg border border-border p-4">
+                    <p className="font-medium">Privacy Policy</p>
+                    <p className="text-muted-foreground text-xs mt-1">Your data is secure. We never share personal information with third parties.</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
