@@ -129,7 +129,7 @@ const Checkout = () => {
                 ) : !showAddressForm ? (
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="mt-4 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-8 w-full md:w-72 text-primary font-medium"
+                    className="mt-4 flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-6 md:p-8 w-full md:w-72 text-primary font-medium text-sm"
                   >
                     <span className="text-2xl">+</span> Add New Address
                   </button>
