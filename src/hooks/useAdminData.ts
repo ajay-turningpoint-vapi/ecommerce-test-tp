@@ -1,22 +1,38 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+
+function getAdminToken() {
+  return localStorage.getItem('adminToken') || '';
+}
+
+async function adminFetch(resource: string, method = 'GET', body?: any, id?: string) {
+  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+  let url = `https://${projectId}.supabase.co/functions/v1/admin-api?resource=${resource}`;
+  if (id) url += `&id=${id}`;
+
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getAdminToken()}`,
+      'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// ─── READ HOOKS ───
 
 export function useAdminOrders() {
   return useQuery({
     queryKey: ['admin-orders'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          id, order_number, status, total_amount, payment_status, created_at, user_id,
-          order_items (id, product_name, quantity, price, status, variant_id),
-          user_addresses!orders_shipping_address_id_fkey (name, phone, address_line1, address_line2, city, pincode)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('orders'),
     staleTime: 30_000,
   });
 }
@@ -24,17 +40,7 @@ export function useAdminOrders() {
 export function useAdminProducts() {
   return useQuery({
     queryKey: ['admin-products'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id, title, slug, description, category_id, brand_id, status, weight, tags, discount, delivery_time,
-          product_variants (id, name, size, price, discount_price, mrp, sku, status, is_default)
-        `)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('products'),
     staleTime: 60_000,
   });
 }
@@ -42,14 +48,7 @@ export function useAdminProducts() {
 export function useAdminCategories() {
   return useQuery({
     queryKey: ['admin-categories'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('level', { ascending: true });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('categories'),
     staleTime: 60_000,
   });
 }
@@ -57,19 +56,7 @@ export function useAdminCategories() {
 export function useAdminInventory() {
   return useQuery({
     queryKey: ['admin-inventory'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('inventory')
-        .select(`
-          id, available_stock, reserved_stock, damaged_stock,
-          product_variants!inventory_variant_id_fkey (id, name, size, sku, price,
-            products!product_variants_product_id_fkey (id, title)
-          )
-        `)
-        .order('available_stock', { ascending: true });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('inventory'),
     staleTime: 30_000,
   });
 }
@@ -77,14 +64,7 @@ export function useAdminInventory() {
 export function useAdminCustomers() {
   return useQuery({
     queryKey: ['admin-customers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('users')
-        .select('id, name, email, phone, status, created_at')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('customers'),
     staleTime: 60_000,
   });
 }
@@ -92,14 +72,7 @@ export function useAdminCustomers() {
 export function useAdminBanners() {
   return useQuery({
     queryKey: ['admin-banners'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .order('position');
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('banners'),
     staleTime: 60_000,
   });
 }
@@ -107,17 +80,7 @@ export function useAdminBanners() {
 export function useAdminShipments() {
   return useQuery({
     queryKey: ['admin-shipments'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('shipments')
-        .select(`
-          id, order_id, tracking_number, courier_name, status, shipped_at, estimated_delivery, created_at,
-          orders!shipments_order_id_fkey (order_number)
-        `)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('shipments'),
     staleTime: 30_000,
   });
 }
@@ -125,19 +88,39 @@ export function useAdminShipments() {
 export function useAdminReturns() {
   return useQuery({
     queryKey: ['admin-returns'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('returns')
-        .select(`
-          id, reason, status, requested_at,
-          order_items!returns_order_item_id_fkey (id, product_name, price, quantity,
-            orders!order_items_order_id_fkey (order_number)
-          )
-        `)
-        .order('requested_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: () => adminFetch('returns'),
     staleTime: 30_000,
   });
+}
+
+export function useAdminDashboard() {
+  return useQuery({
+    queryKey: ['admin-dashboard'],
+    queryFn: () => adminFetch('dashboard'),
+    staleTime: 30_000,
+  });
+}
+
+// ─── MUTATION HOOKS ───
+
+export function useAdminMutation(resource: string) {
+  const qc = useQueryClient();
+  const key = `admin-${resource}`;
+
+  const create = useMutation({
+    mutationFn: (body: any) => adminFetch(resource, 'POST', body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [key] }),
+  });
+
+  const update = useMutation({
+    mutationFn: ({ id, ...body }: any) => adminFetch(resource, 'PUT', body, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [key] }),
+  });
+
+  const remove = useMutation({
+    mutationFn: (id: string) => adminFetch(resource, 'DELETE', undefined, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: [key] }),
+  });
+
+  return { create, update, remove };
 }

@@ -1,24 +1,36 @@
 import { useState, useMemo } from 'react';
 import { Search, AlertTriangle } from 'lucide-react';
-import { generateMockStock, StockItem } from '@/data/adminMockData';
+import { useAdminInventory, useAdminMutation } from '@/hooks/useAdminData';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const LOW_STOCK_THRESHOLD = 10;
 
 const StockManagement = () => {
-  const [stock, setStock] = useState<StockItem[]>(() => generateMockStock());
+  const { data: inventory = [], isLoading } = useAdminInventory();
+  const { update } = useAdminMutation('inventory');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'low'>('all');
 
   const filtered = useMemo(() => {
-    let list = stock;
-    if (filter === 'low') list = list.filter(s => s.currentStock <= s.lowStockThreshold);
-    if (search) list = list.filter(s => s.productName.toLowerCase().includes(search.toLowerCase()));
+    let list = inventory;
+    if (filter === 'low') list = list.filter((s: any) => s.available_stock <= LOW_STOCK_THRESHOLD);
+    if (search) list = list.filter((s: any) => {
+      const productName = s.product_variants?.products?.title || '';
+      const variantName = s.product_variants?.name || '';
+      return productName.toLowerCase().includes(search.toLowerCase()) || variantName.toLowerCase().includes(search.toLowerCase());
+    });
     return list;
-  }, [stock, search, filter]);
+  }, [inventory, search, filter]);
 
-  const updateStock = (variantId: string, newStock: number) => {
-    setStock(prev => prev.map(s => s.variantId === variantId ? { ...s, currentStock: newStock } : s));
-    toast.success('Stock updated');
+  const updateStock = (id: string, available_stock: number) => {
+    update.mutate({ id, available_stock }, {
+      onSuccess: () => toast.success('Stock updated'),
+      onError: (e) => toast.error(e.message),
+    });
   };
+
+  if (isLoading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-64 w-full" /></div>;
 
   return (
     <div className="space-y-4">
@@ -42,31 +54,40 @@ const StockManagement = () => {
           <thead><tr className="border-b border-border bg-muted/50">
             <th className="text-left px-4 py-3 font-medium">Product</th>
             <th className="text-left px-4 py-3 font-medium">Variant</th>
-            <th className="text-left px-4 py-3 font-medium">Current Stock</th>
-            <th className="text-left px-4 py-3 font-medium">Reserved</th>
             <th className="text-left px-4 py-3 font-medium">Available</th>
+            <th className="text-left px-4 py-3 font-medium">Reserved</th>
+            <th className="text-left px-4 py-3 font-medium">Damaged</th>
             <th className="text-left px-4 py-3 font-medium">Update</th>
           </tr></thead>
           <tbody>
-            {filtered.map(s => (
-              <tr key={s.variantId} className={`border-b border-border ${s.currentStock <= s.lowStockThreshold ? 'bg-destructive/5' : 'hover:bg-muted/30'}`}>
-                <td className="px-4 py-3 font-medium max-w-[200px] truncate">{s.productName}</td>
-                <td className="px-4 py-3">{s.variantName}</td>
-                <td className="px-4 py-3">
-                  {s.currentStock <= s.lowStockThreshold && <AlertTriangle className="h-3 w-3 text-destructive inline mr-1" />}
-                  {s.currentStock}
-                </td>
-                <td className="px-4 py-3">{s.reservedStock}</td>
-                <td className="px-4 py-3 font-medium">{Math.max(0, s.currentStock - s.reservedStock)}</td>
-                <td className="px-4 py-3">
-                  <input type="number" defaultValue={s.currentStock} min={0}
-                    onBlur={e => updateStock(s.variantId, Number(e.target.value))}
-                    className="w-20 rounded border border-border px-2 py-1 text-sm" />
-                </td>
-              </tr>
-            ))}
+            {filtered.map((s: any) => {
+              const productName = s.product_variants?.products?.title || 'Unknown';
+              const variantName = s.product_variants?.name || s.product_variants?.size || '—';
+              const isLow = s.available_stock <= LOW_STOCK_THRESHOLD;
+              return (
+                <tr key={s.id} className={`border-b border-border ${isLow ? 'bg-destructive/5' : 'hover:bg-muted/30'}`}>
+                  <td className="px-4 py-3 font-medium max-w-[200px] truncate">{productName}</td>
+                  <td className="px-4 py-3">{variantName}</td>
+                  <td className="px-4 py-3">
+                    {isLow && <AlertTriangle className="h-3 w-3 text-destructive inline mr-1" />}
+                    {s.available_stock}
+                  </td>
+                  <td className="px-4 py-3">{s.reserved_stock}</td>
+                  <td className="px-4 py-3">{s.damaged_stock}</td>
+                  <td className="px-4 py-3">
+                    <input type="number" defaultValue={s.available_stock} min={0}
+                      onBlur={e => {
+                        const v = Number(e.target.value);
+                        if (v !== s.available_stock) updateStock(s.id, v);
+                      }}
+                      className="w-20 rounded border border-border px-2 py-1 text-sm" />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
+        {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">No inventory records</p>}
       </div>
     </div>
   );

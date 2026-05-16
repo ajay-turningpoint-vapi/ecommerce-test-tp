@@ -1,34 +1,39 @@
 import { useState } from 'react';
 import { Plus, Edit2, Trash2, X, ToggleLeft, ToggleRight } from 'lucide-react';
-import { generateMockBanners, BannerData } from '@/data/adminMockData';
+import { useAdminBanners, useAdminMutation } from '@/hooks/useAdminData';
 import { toast } from 'sonner';
-
-const types = ['Homepage', 'Campaign', 'Sale', 'Category'];
+import { Skeleton } from '@/components/ui/skeleton';
 
 const BannerManagement = () => {
-  const [banners, setBanners] = useState<BannerData[]>(() => generateMockBanners());
-  const [typeFilter, setTypeFilter] = useState('All');
+  const { data: banners = [], isLoading } = useAdminBanners();
+  const { create, update, remove } = useAdminMutation('banners');
   const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<BannerData | null>(null);
+  const [editing, setEditing] = useState<any>(null);
 
-  const filtered = typeFilter === 'All' ? banners : banners.filter(b => b.type === typeFilter);
-
-  const toggleActive = (id: string) => {
-    setBanners(prev => prev.map(b => b.id === id ? { ...b, isActive: !b.isActive } : b));
-    toast.success('Banner status updated');
+  const toggleActive = (banner: any) => {
+    const newStatus = banner.status === 'active' ? 'inactive' : 'active';
+    update.mutate({ id: banner.id, status: newStatus }, {
+      onSuccess: () => toast.success('Banner status updated'),
+    });
   };
 
   const deleteBanner = (id: string) => {
-    setBanners(prev => prev.filter(b => b.id !== id));
-    toast.success('Banner deleted');
+    remove.mutate(id, { onSuccess: () => toast.success('Banner deleted') });
   };
 
-  const saveBanner = (banner: BannerData) => {
-    if (editing) setBanners(prev => prev.map(b => b.id === banner.id ? banner : b));
-    else setBanners(prev => [...prev, { ...banner, id: `ban-${Date.now()}` }]);
-    setShowForm(false); setEditing(null);
-    toast.success(editing ? 'Banner updated' : 'Banner added');
+  const saveBanner = (data: any) => {
+    if (editing) {
+      update.mutate({ id: editing.id, ...data }, {
+        onSuccess: () => { toast.success('Banner updated'); setShowForm(false); setEditing(null); },
+      });
+    } else {
+      create.mutate(data, {
+        onSuccess: () => { toast.success('Banner added'); setShowForm(false); },
+      });
+    }
   };
+
+  if (isLoading) return <div className="space-y-4"><Skeleton className="h-8 w-48" /><Skeleton className="h-40 w-full" /></div>;
 
   return (
     <div className="space-y-4">
@@ -39,29 +44,23 @@ const BannerManagement = () => {
         </button>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
-        {['All', ...types].map(t => (
-          <button key={t} onClick={() => setTypeFilter(t)} className={`px-3 py-1.5 rounded-lg text-sm font-medium border ${typeFilter === t ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-muted'}`}>{t}</button>
-        ))}
-      </div>
-
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.map(b => (
+        {banners.map((b: any) => (
           <div key={b.id} className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="aspect-[16/7] bg-muted flex items-center justify-center">
-              <img src={b.image} alt={b.title} className="w-full h-full object-cover" />
+              <img src={b.image_url} alt={b.title} className="w-full h-full object-cover" />
             </div>
             <div className="p-4">
               <div className="flex items-center justify-between mb-1">
                 <h4 className="font-medium text-sm">{b.title}</h4>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${b.isActive ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}`}>
-                  {b.isActive ? 'Active' : 'Inactive'}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${b.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-muted text-muted-foreground'}`}>
+                  {b.status}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">{b.type}</p>
+              <p className="text-xs text-muted-foreground mb-3">Position: {b.position}</p>
               <div className="flex gap-1">
-                <button onClick={() => toggleActive(b.id)} className="p-1.5 rounded hover:bg-muted">
-                  {b.isActive ? <ToggleRight className="h-4 w-4 text-green-600" /> : <ToggleLeft className="h-4 w-4" />}
+                <button onClick={() => toggleActive(b)} className="p-1.5 rounded hover:bg-muted">
+                  {b.status === 'active' ? <ToggleRight className="h-4 w-4 text-green-600" /> : <ToggleLeft className="h-4 w-4" />}
                 </button>
                 <button onClick={() => { setEditing(b); setShowForm(true); }} className="p-1.5 rounded hover:bg-muted"><Edit2 className="h-4 w-4" /></button>
                 <button onClick={() => deleteBanner(b.id)} className="p-1.5 rounded hover:bg-destructive/10 text-destructive"><Trash2 className="h-4 w-4" /></button>
@@ -70,6 +69,7 @@ const BannerManagement = () => {
           </div>
         ))}
       </div>
+      {banners.length === 0 && <p className="text-center text-muted-foreground py-8">No banners yet</p>}
 
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -86,22 +86,23 @@ const BannerManagement = () => {
   );
 };
 
-const BannerForm = ({ initial, onSave }: { initial: BannerData | null; onSave: (b: BannerData) => void }) => {
+const BannerForm = ({ initial, onSave }: { initial: any; onSave: (d: any) => void }) => {
   const [title, setTitle] = useState(initial?.title || '');
-  const [type, setType] = useState(initial?.type || 'Homepage');
-  const [link, setLink] = useState(initial?.link || '/');
-  const [isActive, setIsActive] = useState(initial?.isActive ?? true);
+  const [imageUrl, setImageUrl] = useState(initial?.image_url || '');
+  const [link, setLink] = useState(initial?.link || '');
+  const [position, setPosition] = useState(initial?.position ?? 0);
+  const [status, setStatus] = useState(initial?.status || 'active');
 
   return (
-    <form onSubmit={e => { e.preventDefault(); onSave({ id: initial?.id || '', title, type, image: initial?.image || '/placeholder.svg', link, isActive, startDate: new Date().toISOString(), endDate: new Date(Date.now() + 30 * 86400000).toISOString() }); }} className="space-y-3">
-      <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Banner Title" className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
-      <select value={type} onChange={e => setType(e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm">
-        {types.map(t => <option key={t}>{t}</option>)}
-      </select>
+    <form onSubmit={e => { e.preventDefault(); onSave({ title, image_url: imageUrl || '/placeholder.svg', link: link || null, position: Number(position), status }); }} className="space-y-3">
+      <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Banner Title" className="w-full rounded-lg border border-border px-3 py-2 text-sm" required />
+      <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} placeholder="Image URL" className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
       <input value={link} onChange={e => setLink(e.target.value)} placeholder="Link URL" className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} /> Active
-      </label>
+      <input type="number" value={position} onChange={e => setPosition(e.target.value)} placeholder="Position" className="w-full rounded-lg border border-border px-3 py-2 text-sm" />
+      <select value={status} onChange={e => setStatus(e.target.value)} className="w-full rounded-lg border border-border px-3 py-2 text-sm">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
       <button type="submit" className="w-full rounded-lg bg-primary py-2.5 text-sm font-bold text-primary-foreground">Save</button>
     </form>
   );
