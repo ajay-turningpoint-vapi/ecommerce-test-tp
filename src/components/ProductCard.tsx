@@ -15,47 +15,13 @@ const ProductCard = ({ product }: Props) => {
 
   return (
     <div className="group rounded-lg border border-border bg-card overflow-hidden">
-      <Link to={`/product/${product.slug}`} className="block relative">
+      <Link to={`/product/${product.slug}`} className="block">
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
           className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {product.variants.length > 1 ? (
-          <span className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-primary-foreground shadow-sm">
-            View Variants <ChevronDown className="h-3 w-3" />
-          </span>
-        ) : qty === 0 ? (
-          <button
-            onClick={e => {
-              e.preventDefault();
-              addItem(product, variant.id);
-            }}
-            className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-          >
-            <Plus className="h-3 w-3" /> Add
-          </button>
-        ) : (
-          <div
-            onClick={e => e.preventDefault()}
-            className="absolute bottom-3 right-3 flex items-center gap-1 rounded-lg border border-primary bg-background overflow-hidden"
-          >
-            <button
-              onClick={e => { e.preventDefault(); updateQuantity(product.id, variant.id, qty - 1); }}
-              className="px-2 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
-            >
-              <Minus className="h-3 w-3" />
-            </button>
-            <span className="px-2 text-xs font-bold text-primary">{qty}</span>
-            <button
-              onClick={e => { e.preventDefault(); updateQuantity(product.id, variant.id, qty + 1); }}
-              className="px-2 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
-            >
-              <Plus className="h-3 w-3" />
-            </button>
-          </div>
-        )}
       </Link>
       <div className="p-3">
         <Link to={`/product/${product.slug}`}>
@@ -75,6 +41,39 @@ const ProductCard = ({ product }: Props) => {
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-success" />
           Delivery in {product.deliveryTime}
         </p>
+        <div className="mt-2">
+          {product.variants.length > 1 ? (
+            <Link
+              to={`/product/${product.slug}`}
+              className="flex items-center justify-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground w-full"
+            >
+              View Variants <ChevronDown className="h-3 w-3" />
+            </Link>
+          ) : qty === 0 ? (
+            <button
+              onClick={() => addItem(product, variant.id)}
+              className="flex items-center justify-center gap-1 rounded-lg border border-primary bg-background px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-colors w-full"
+            >
+              <Plus className="h-3 w-3" /> Add
+            </button>
+          ) : (
+            <div className="flex items-center justify-center gap-1 rounded-lg border border-primary bg-background overflow-hidden">
+              <button
+                onClick={() => updateQuantity(product.id, variant.id, qty - 1)}
+                className="px-3 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <span className="px-2 text-xs font-bold text-primary">{qty}</span>
+              <button
+                onClick={() => updateQuantity(product.id, variant.id, qty + 1)}
+                className="px-3 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors text-primary"
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
