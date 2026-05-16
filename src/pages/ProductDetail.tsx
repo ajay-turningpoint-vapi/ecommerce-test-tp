@@ -50,10 +50,15 @@ const ProductDetail = () => {
   const categories = catData?.categories || [];
   const { items, addItem, updateQuantity } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(0);
+  const { addRecent } = useRecentlyViewed();
 
   useEffect(() => {
     setSelectedVariant(0);
   }, [slug]);
+
+  useEffect(() => {
+    if (product?.id) addRecent(product.id);
+  }, [product?.id, addRecent]);
 
   // Build attribute options across all variants
   const { attributeMap, isColorAttr } = useMemo(() => {
