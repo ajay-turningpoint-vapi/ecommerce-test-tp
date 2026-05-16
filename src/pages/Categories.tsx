@@ -2,7 +2,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Link } from 'react-router-dom';
 import { useDbCategories } from '@/hooks/useDbCategories';
-import { CategorySkeleton } from '@/components/skeletons/CategorySkeleton';
+import CategorySkeleton from '@/components/skeletons/CategorySkeleton';
 
 const Categories = () => {
   const { data, isLoading } = useDbCategories();
@@ -27,8 +27,8 @@ const Categories = () => {
                 to={`/category/${cat.slug}`}
                 className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-4 hover:shadow-md transition-shadow"
               >
-                {cat.icon ? (
-                  <img src={cat.icon} alt={cat.name} className="h-16 w-16 object-contain rounded-lg" />
+                {(cat as any).icon ? (
+                  <img src={(cat as any).icon} alt={cat.name} className="h-16 w-16 object-contain rounded-lg" />
                 ) : (
                   <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
                     {cat.name.charAt(0)}
