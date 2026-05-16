@@ -32,6 +32,7 @@ const Category = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
   const [activeFilters, setActiveFilters] = useState<Record<string, string[]>>({});
+  const [sortOrder, setSortOrder] = useState<'none' | 'low-high' | 'high-low'>('none');
   const [filterOpen, setFilterOpen] = useState(false);
 
   const loading = productsLoading || catsLoading;
