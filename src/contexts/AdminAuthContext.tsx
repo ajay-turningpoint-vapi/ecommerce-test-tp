@@ -45,7 +45,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const adminLogout = () => {
-    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
     setAdminUser(null);
   };
 
