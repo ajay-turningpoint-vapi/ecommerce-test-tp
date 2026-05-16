@@ -70,7 +70,13 @@ const PageFallback = () => (
   </div>
 );
 
-const App = () => (
+const App = () => {
+  const [loading, setLoading] = useState(true);
+  const handleComplete = useCallback(() => setLoading(false), []);
+
+  return (
+    <>
+      {loading && <Preloader onComplete={handleComplete} />}
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <AdminAuthProvider>
