@@ -16,7 +16,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   if (variant === 'full' && image) {
     return (
       <Link to={link} className={`block rounded-2xl overflow-hidden relative group ${className}`}>
-        <div className="aspect-[16/9] md:max-h-[400px] lg:max-h-[450px]">
+        <div className="aspect-[16/9] md:aspect-[21/7] md:max-h-[280px] lg:max-h-[320px] xl:max-h-[360px]">
           <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       </Link>
@@ -38,7 +38,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   if (variant === 'vertical' && image) {
     return (
       <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
-        <div className="aspect-[16/9] md:max-h-[400px] lg:max-h-[450px]">
+        <div className="aspect-[16/9] md:aspect-[21/7] md:max-h-[280px] lg:max-h-[320px] xl:max-h-[360px]">
           <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       </Link>
@@ -49,7 +49,7 @@ const PromoBanner = ({ image, title, subtitle, cta, link = '/', variant = 'horiz
   return (
     <Link to={link} className={`block rounded-2xl overflow-hidden ${className}`}>
       {image ? (
-        <div className="aspect-[16/9] md:max-h-[400px] lg:max-h-[450px]">
+        <div className="aspect-[16/9] md:aspect-[21/7] md:max-h-[280px] lg:max-h-[320px] xl:max-h-[360px]">
           <img src={image} alt={title} className="w-full h-full object-cover" loading="lazy" />
         </div>
       ) : (
