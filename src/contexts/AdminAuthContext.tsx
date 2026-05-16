@@ -45,8 +45,9 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         p_email: email,
         p_password: password,
       });
-      if (error || !data || data.error) return false;
-      const result = data as any;
+      if (error) return false;
+      const result = data as Record<string, any> | null;
+      if (!result || result.error || !result.token) return false;
       localStorage.setItem('adminToken', result.token);
       setAdminUser(result.admin);
       return true;
