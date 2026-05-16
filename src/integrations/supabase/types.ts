@@ -914,7 +914,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_login: {
+        Args: { p_email: string; p_password: string }
+        Returns: Json
+      }
+      admin_mutation: {
+        Args: {
+          p_data?: Json
+          p_id?: string
+          p_operation: string
+          p_resource: string
+          p_token: string
+        }
+        Returns: Json
+      }
+      verify_admin_token: { Args: { p_token: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
