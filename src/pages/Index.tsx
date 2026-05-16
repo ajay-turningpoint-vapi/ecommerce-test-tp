@@ -84,16 +84,8 @@ const Index = () => {
       <section className="container mx-auto px-4 mt-8">
         <h2 className="text-lg font-bold">Top Deals</h2>
         <p className="text-sm text-muted-foreground">Don't miss out on these offers!</p>
-        <div className="grid grid-cols-2 md:grid-cols-[1fr_2fr_1fr] gap-4 mt-4">
-          {banners.length >= 4 && (
-            <PromoBanner image={banners[3].image} title={banners[3].alt} subtitle="" variant="vertical" link={banners[3].link || '#'} className="hidden md:block" />
-          )}
-          <div className="grid grid-cols-2 gap-4 col-span-2 md:col-span-1">
-            {(trendingDeals.length > 0 ? trendingDeals.slice(0, 4) : currentHits.slice(0, 4)).map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
-          {banners.length >= 5 && (
-            <PromoBanner image={banners[4].image} title={banners[4].alt} subtitle="" variant="vertical" link={banners[4].link || '#'} className="hidden md:block" />
-          )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+          {(trendingDeals.length > 0 ? trendingDeals.slice(0, 4) : currentHits.slice(0, 4)).map(p => <ProductCard key={p.id} product={p} />)}
         </div>
       </section>
 
