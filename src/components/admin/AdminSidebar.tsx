@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Package, Layers, Warehouse,
   Users, Truck, RotateCcw, Image, BarChart3, Settings, LogOut, X,
-  Tag, Bookmark, ChevronDown
+  Tag, Bookmark, ChevronDown, Percent
 } from 'lucide-react';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { useState } from 'react';
