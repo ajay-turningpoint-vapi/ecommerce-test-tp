@@ -138,7 +138,7 @@ const ProductDetail = () => {
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
             {/* Image gallery with thumbnails */}
-            <ProductImageGallery images={product.images} name={product.name} />
+            <ProductImageGallery images={product.images?.length ? product.images : [product.image]} name={product.name} />
 
             <div>
               <h1 className="text-2xl font-bold">{product.name}</h1>
