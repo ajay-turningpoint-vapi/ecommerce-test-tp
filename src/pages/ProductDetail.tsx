@@ -150,11 +150,16 @@ const ProductDetail = () => {
             <ProductImageGallery images={product.images?.length ? product.images : [product.image]} name={product.name} />
 
             <div>
-              <h1 className="text-2xl font-bold">{product.name}</h1>
-              {product.brandName && (
-                <p className="text-sm font-medium text-primary mt-0.5">by {product.brandName}</p>
-              )}
-              <p className="text-sm text-muted-foreground mt-1">{product.tags.join(' | ')}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold">{product.name}</h1>
+                  {product.brandName && (
+                    <p className="text-sm font-medium text-primary mt-0.5">by {product.brandName}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground mt-1">{product.tags.join(' | ')}</p>
+                </div>
+                <ShareProduct title={product.name} />
+              </div>
 
               <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1"><Package className="h-4 w-4" /> {product.weight}</span>
