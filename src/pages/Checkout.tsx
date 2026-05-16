@@ -18,7 +18,7 @@ const Checkout = () => {
 
   // Address form
   const [address, setAddress] = useState<Partial<Address>>({
-    pincode: '', house: '', road: '', name: user?.name || '', phone: user?.phone || '', email: user?.email || '', isDefault: true,
+    pincode: '', house: '', road: '', landmark: '', city: '', state: '', name: user?.name || '', phone: user?.phone || '', email: user?.email || '', isDefault: true,
   });
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [savedAddress, setSavedAddress] = useState<Address | null>(null);
@@ -38,6 +38,9 @@ const Checkout = () => {
       pincode: address.pincode || '',
       house: address.house || '',
       road: address.road || '',
+      landmark: address.landmark || '',
+      city: address.city || '',
+      state: address.state || '',
       name: address.name || '',
       phone: address.phone || '',
       email: address.email || '',

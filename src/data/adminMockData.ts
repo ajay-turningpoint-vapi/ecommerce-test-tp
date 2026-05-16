@@ -4,7 +4,7 @@ import type { Order, Address } from '@/types';
 const sampleAddress: Address = {
   id: 'addr1', pincode: '400001', house: '12A, Rose Apartments',
   road: 'MG Road, Andheri West', name: 'Priya Sharma', phone: '+91 9876543210',
-  email: 'priya@email.com', isDefault: true,
+  email: 'priya@email.com', city: 'Mumbai', state: 'Maharashtra', isDefault: true,
 };
 
 const statuses = ['Pending', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled', 'Return Requested'];
